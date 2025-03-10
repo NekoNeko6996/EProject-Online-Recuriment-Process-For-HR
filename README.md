@@ -5,3 +5,5 @@
 1. Bootstrap
 2. EntityFramework
 3. FontAwesome
+4. Microsoft.AspNet.Identity.EntityFramework
+5. Install-Package Microsoft.AspNet.Identity.Owin
