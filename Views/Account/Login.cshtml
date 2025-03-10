@@ -1,0 +1,37 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Auth.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_AccountLayoutPage.cshtml";
+}
+
+<div class="container d-flex align-items-center flex-column mt-5">
+    <img src="@Url.Content("~/Content/Resources/Icons/hazard-warning.webp")" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
+    <h3 class="text-center">Login To {Web Name}</h3>
+    <div class="card p-4 mt-4" style="max-width: 400px; width: 100%;">
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        }
+    </div>
+
+    <div class="card mt-4 p-3" style="max-width: 400px; width: 100%;">
+        <p class="text-center m-0">A New Member? <a href="@Url.Action("Register", "Account")" class="text-decoration-none">Create new account!</a></p>
+    </div>
+</div>
