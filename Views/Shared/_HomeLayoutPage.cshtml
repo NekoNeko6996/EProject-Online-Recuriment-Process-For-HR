@@ -1,22 +1,4 @@
-﻿@using Microsoft.AspNet.Identity
-@using Sem3EProjectOnlineCPFH.Models.Auth
-@using Sem3EProjectOnlineCPFH.Models
-
-@{
-    var userId = User.Identity.GetUserId();
-    ApplicationUser currentUser = null;
-
-    if (!string.IsNullOrEmpty(userId))
-    {
-        using (var db = new ApplicationDbContext())
-        {
-            currentUser = db.Users.Find(userId);
-        }
-    }
-}
-
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html>
 <head>
@@ -48,16 +30,16 @@
                                    class="d-flex align-items-center text-decoration-none dropdown-toggle rounded"
                                    data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #BBB; padding: 2px 5px 2px 5px">
                                     <span class="fw-bold">
-                                        @if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.FirstName))
+                                        @if (ViewBag.CurrentUser != null && !string.IsNullOrWhiteSpace(ViewBag.CurrentUser.FirstName))
                                         {
-                                            @String.Concat(currentUser.FirstName, " ", currentUser.LastName)
+                                            @String.Concat(ViewBag.CurrentUser.FirstName, " ", ViewBag.CurrentUser.LastName)
                                         }
                                         else
                                         {
                                             @("Default User Name")
                                         }
                                     </span>
-                                    <img src="@Url.Content("~/Content/Resources/DefaultImg.png")" alt="User Avatar" class="rounded-circle ms-2" width="31" height="31">
+                                    <img src="@Url.Content($"~{ViewBag.CurrentUser.UserProfile.AvatarUrl}")" alt="User Avatar" class="rounded-circle ms-2" width="31" height="31">
                                 </a>
 
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">

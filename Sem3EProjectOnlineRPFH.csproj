@@ -171,6 +171,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -253,6 +254,7 @@
     <Folder Include="Content\Resources\Avatars\" />
     <Folder Include="Content\Resources\Icons\" />
     <Folder Include="Models\Data\" />
+    <Folder Include="Views\Base\" />
     <Folder Include="Views\Default\" />
   </ItemGroup>
   <ItemGroup>

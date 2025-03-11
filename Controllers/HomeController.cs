@@ -11,7 +11,7 @@ using Sem3EProjectOnlineCPFH.Models;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         // GET: Home
         public ActionResult Index()

@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly ApplicationUserManager _userManager;
         private readonly ApplicationSignInManager _signInManager;
