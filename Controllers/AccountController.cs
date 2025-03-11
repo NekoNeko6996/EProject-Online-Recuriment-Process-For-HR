@@ -33,7 +33,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             {
                 if (_roleManager == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("⚠️ RoleManager is NULL! Initializing again...");
+                    System.Diagnostics.Debug.WriteLine("RoleManager is NULL! Initializing again...");
                     _roleManager = HttpContext.GetOwinContext().Get<ApplicationRoleManager>();
                 }
                 return _roleManager;
@@ -70,7 +70,6 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(model);
             }
 
-            // Tạo User trước
             var user = new ApplicationUser
             {
                 UserName = model.Email,
@@ -96,16 +95,14 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(model);
             }
 
-            // Tạo hồ sơ UserProfile sau khi User được tạo thành công
             try
             {
                 using (var db = new ApplicationDbContext())
                 {
                     var userProfile = new UserProfile
                     {
-                        Id = user.Id, // Sử dụng User.Id làm khóa chính
+                        Id = user.Id,
                         AvatarUrl = "~/Content/Resources/DefaultImg.png",
-                        Bio = "Chưa có thông tin nào."
                     };
 
                     db.UserProfiles.Add(userProfile);
@@ -205,7 +202,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
         // GET: Account Setting
         [Authorize]
-        public ActionResult Setting()
+        public ActionResult ProfileSetting()
         {
             using (var db = new ApplicationDbContext())
             {
@@ -252,7 +249,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     System.Diagnostics.Debug.WriteLine("Validation Error: " + error.ErrorMessage);
                 }
                 TempData["ErrorMessage"] = "Invalid input, Please Try Again...";
-                return View("Setting", new ProfileSettingsViewModel { ProfileUpdate = model.ProfileUpdate});
+                return View("ProfileSetting", new ProfileSettingsViewModel { ProfileUpdate = model.ProfileUpdate});
             }
 
             // Update profile
@@ -278,8 +275,8 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 db.SaveChanges();
                 System.Diagnostics.Debug.WriteLine("Profile updated successfully for: " + user.Email);
             }
-            TempData["SuccessMessage"] = "Profile updated successfully...";
-            return RedirectToAction("Setting");
+            TempData["SuccessMessage"] = "Profile updated successfully!";
+            return RedirectToAction("ProfileSetting");
         }
 
         // POST: Account Setting [change password]
@@ -289,8 +286,8 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Please fix the errors below.";
-                return RedirectToAction("Setting");
+                TempData["ErrorMessage"] = "Invalid Input";
+                return RedirectToAction("ProfileSetting");
             }
 
             try
@@ -301,17 +298,84 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 if (result.Succeeded)
                 {
                     TempData["SuccessMessage"] = "Password changed successfully!";
-                    return RedirectToAction("Setting");
+                    return RedirectToAction("ProfileSetting");
                 }
 
                 TempData["ErrorMessage"] = string.Join("<br/>", result.Errors);
-                return RedirectToAction("Setting");
+                return RedirectToAction("ProfileSetting");
             }
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again.";
-                return RedirectToAction("Setting");
+                return RedirectToAction("ProfileSetting");
             }
+        }
+
+        // POST: Account Setting [upload avatar]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UploadAvatar(HttpPostedFileBase avatar)
+        {
+            if (avatar == null || avatar.ContentLength == 0)
+            {
+                TempData["ErrorMessage"] = "No file selected or file is empty.";
+                return RedirectToAction("ProfileSetting");
+            }
+
+            if (avatar.ContentLength > 5 * 1024 * 1024)
+            {
+                TempData["ErrorMessage"] = "File size must be less than 5MB.";
+                return RedirectToAction("ProfileSetting");
+            }
+
+            if (!avatar.ContentType.StartsWith("image/"))
+            {
+                TempData["ErrorMessage"] = "Invalid file type. Only images are allowed.";
+                return RedirectToAction("ProfileSetting");
+            }
+
+            using (var db = new ApplicationDbContext())
+            {
+                var user = db.Users.Find(User.Identity.GetUserId());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return RedirectToAction("ProfileSetting");
+                }
+
+                string oldAvatarPath = Server.MapPath(user.UserProfile.AvatarUrl);
+
+                // Tạo tên file mới
+                string fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(avatar.FileName);
+                string newAvatarPath = System.IO.Path.Combine(Server.MapPath("~/Content/Resources/Avatars"), fileName);
+
+                try
+                {
+                    // **Xóa avatar cũ nếu không phải ảnh mặc định**
+                    if (!string.IsNullOrEmpty(user.UserProfile.AvatarUrl) &&
+                        System.IO.File.Exists(oldAvatarPath) &&
+                        !user.UserProfile.AvatarUrl.Contains("DefaultImg.png"))
+                    {
+                        System.IO.File.Delete(oldAvatarPath);
+                        System.Diagnostics.Debug.WriteLine($"Deleted old avatar: {oldAvatarPath}");
+                    }
+
+                    // Lưu ảnh mới
+                    avatar.SaveAs(newAvatarPath);
+                    user.UserProfile.AvatarUrl = "/Content/Resources/Avatars/" + fileName; // Lưu đường dẫn tương đối
+                    db.SaveChanges();
+
+                    System.Diagnostics.Debug.WriteLine($"Avatar updated successfully for: {user.Email}");
+                    TempData["SuccessMessage"] = "Avatar updated successfully!";
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = "An error occurred while uploading the file.";
+                    System.Diagnostics.Debug.WriteLine("Error uploading avatar: " + ex.Message);
+                }
+            }
+
+            return RedirectToAction("ProfileSetting");
         }
 
     }

@@ -240,7 +240,7 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\_HomeOnlyTopNavLayoutPage.cshtml" />
-    <Content Include="Views\Account\Setting.cshtml" />
+    <Content Include="Views\Account\ProfileSetting.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -250,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Resources\Avatars\" />
     <Folder Include="Content\Resources\Icons\" />
     <Folder Include="Models\Data\" />
     <Folder Include="Views\Default\" />
