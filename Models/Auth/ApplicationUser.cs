@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Sem3EProjectOnlineCPFH.Models;
 
 namespace Sem3EProjectOnlineCPFH.Models.Auth
 {
@@ -31,5 +32,8 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
+
+        //
+        public virtual UserProfile UserProfile { get; set; }
     }
 }

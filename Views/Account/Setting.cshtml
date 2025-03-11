@@ -1,0 +1,212 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Auth.ProfileSettingsViewModel
+
+@{
+    ViewBag.Title = "Profile Settings";
+    Layout = "~/Views/Shared/_HomeOnlyTopNavLayoutPage.cshtml";
+}
+
+@if (Model == null)
+{
+    <p class="text-danger">Error: Profile data not found.</p>
+}
+else
+{
+    <style>
+        #setting-input-avatar-label {
+            opacity: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            transition: background-color 0.3s;
+            border-radius: 50%;
+        }
+
+            #setting-input-avatar-label:hover {
+                opacity: 1;
+            }
+
+        .active {
+            background-color: transparent !important;
+            color: #007bff !important;
+            border-left: 3px solid #007bff !important;
+        }
+
+        .border-radius-0 {
+            border-radius: 0 !important;
+        }
+
+        .sticky-sidebar {
+            position: sticky;
+            top: 20px;
+            display: inline-block;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Profile Settings</h2>
+        <hr />
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row">
+            <!-- Left Navigation -->
+            <div class="col-md-3 sticky-sidebar">
+                <div class="list-group bg-white">
+                    <a href="#" class="list-group-item border-0 border-radius-0 list-group-item-action active" id="btnProfile" onclick="showSection('profileSection')">Profile Info</a>
+                    <a href="#" class="list-group-item border-0 border-radius-0 list-group-item-action" id="btnPassword" onclick="showSection('passwordSection')">Change Password</a>
+                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { onsubmit = "return confirm('Are you sure you want to Logout your account? This action cannot be undone.')", @class = "mt-3" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="list-group-item list-group-item-action list-group-item-danger">Logout Account</button>
+                    }
+                </div>
+            </div>
+
+            <!-- Profile Form Section -->
+            <div class="col-md-6">
+                <div id="profileSection">
+                    @using (Html.BeginForm("UpdateProfile", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <!-- Personal Info -->
+                        <h5>Personal Information</h5>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.FirstName, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.FirstName, new { @class = "form-control", autocomplete = "given-name" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.LastName, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.LastName, new { @class = "form-control", autocomplete = "family-name" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.Email, new { @class = "form-control", type = "email", autocomplete = "email" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.PhoneNumber, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.PhoneNumber, new { @class = "form-control", type = "tel", autocomplete = "tel" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.Bio, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.ProfileUpdate.Bio, new { @class = "form-control", rows = "3", placeholder = "Tell us something about yourself..." })
+                        </div>
+
+                        <hr>
+
+                        <!-- Address -->
+                        <h5>Address</h5>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.Address, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.Address, new { @class = "form-control" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.City, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.City, new { @class = "form-control" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.Country, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.Country, new { @class = "form-control" })
+                        </div>
+
+                        <hr>
+
+                        <!-- Social Accounts -->
+                        <h5>Social Accounts</h5>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.SocialAccount1, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.SocialAccount1, new { @class = "form-control", placeholder = "Enter your LinkedIn, GitHub, etc." })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.SocialAccount2, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.SocialAccount2, new { @class = "form-control" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ProfileUpdate.SocialAccount3, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ProfileUpdate.SocialAccount3, new { @class = "form-control" })
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    }
+                </div>
+
+                <!-- Change Password Section (Hidden by Default) -->
+                <div id="passwordSection" style="display: none;">
+                    <h4>Change Password</h4>
+                    @using (Html.BeginForm("ChangePassword", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ChangePassword.OldPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.ChangePassword.OldPassword, new { @class = "form-control", placeholder = "Current password" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ChangePassword.NewPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.ChangePassword.NewPassword, new { @class = "form-control", placeholder = "New password" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ChangePassword.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(model => model.ChangePassword.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm new password" })
+                        </div>
+
+                        <button type="submit" class="btn btn-danger">Change Password</button>
+                    }
+                </div>
+            </div>
+
+            <!-- Avatar Section -->
+            <div class="col-md-3 d-flex align-items-center flex-column position-relative">
+                <img src="@Url.Content(Model.ProfileUpdate.AvatarUrl ?? "~/Content/Resources/DefaultImg.png")"
+                     alt="Profile Avatar"
+                     class="img-thumbnail rounded-circle"
+                     style="width: 150px; height: 150px;">
+                <label for="setting-input-avatar" id="setting-input-avatar-label" class="position-absolute top-0 d-flex justify-content-center align-items-center" style="cursor: pointer; width: 150px; aspect-ratio:1/1">
+                    <i class="fa-solid fa-camera"></i>
+                </label>
+                <form action="@Url.Action("UploadAvatar", "Profile")" method="post" enctype="multipart/form-data" class="mt-3">
+                    <input type="file" name="avatar" id="setting-input-avatar" class="form-control mb-2" hidden>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Upload New Photo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <br />
+    <br />
+}
+
+<script>
+    function showSection(sectionId) {
+        document.getElementById("profileSection").style.display = "none";
+        document.getElementById("passwordSection").style.display = "none";
+        document.getElementById(sectionId).style.display = "block";
+        document.getElementById("btnProfile").classList.toggle("active", sectionId === "profileSection");
+        document.getElementById("btnPassword").classList.toggle("active", sectionId === "passwordSection");
+    }
+</script>

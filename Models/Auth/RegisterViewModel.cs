@@ -24,16 +24,14 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
         [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         public string ConfirmPassword { get; set; }
 
-        [Required, StringLength(100)]
+        [Required]
         public string Address { get; set; }
-
-        [StringLength(50)]
+        [Required]
         public string City { get; set; }
-
-        [StringLength(50)]
+        [Required]
         public string Country { get; set; }
 
-        [Phone]
+        [Phone, Required]
         public string PhoneNumber { get; set; }
     }
 }

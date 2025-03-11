@@ -154,6 +154,7 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\Resources\DefaultImg.png" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -182,11 +184,24 @@
     <Compile Include="Migrations\202503080854581_initauthv1.Designer.cs">
       <DependentUpon>202503080854581_initauthv1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503110119482_addprofilev1.cs" />
+    <Compile Include="Migrations\202503110119482_addprofilev1.Designer.cs">
+      <DependentUpon>202503110119482_addprofilev1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503110150426_updateUsers.cs" />
+    <Compile Include="Migrations\202503110150426_updateUsers.Designer.cs">
+      <DependentUpon>202503110150426_updateUsers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\Auth\ApplicationRoleManager.cs" />
     <Compile Include="Models\Auth\ApplicationUser.cs" />
+    <Compile Include="Models\Auth\ChangePasswordModelView.cs" />
     <Compile Include="Models\Auth\LoginViewModel.cs" />
+    <Compile Include="Models\Auth\ProfileSettingsViewModel.cs" />
+    <Compile Include="Models\Auth\ProfileViewModel.cs" />
     <Compile Include="Models\Auth\RegisterViewModel.cs" />
+    <Compile Include="Models\user\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -212,7 +227,6 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
-    <Content Include="Content\Resources\Icons\hazard-warning.webp" />
     <None Include="packages.config" />
     <Content Include="Scripts\bootstrap.min.js.map" />
     <Content Include="Scripts\bootstrap.js.map" />
@@ -225,6 +239,8 @@
     <Content Include="Views\Shared\_AccountLayoutPage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Shared\_HomeOnlyTopNavLayoutPage.cshtml" />
+    <Content Include="Views\Account\Setting.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -234,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\Resources\Icons\" />
     <Folder Include="Models\Data\" />
     <Folder Include="Views\Default\" />
   </ItemGroup>
@@ -243,6 +260,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503080854581_initauthv1.resx">
       <DependentUpon>202503080854581_initauthv1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503110119482_addprofilev1.resx">
+      <DependentUpon>202503110119482_addprofilev1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503110150426_updateUsers.resx">
+      <DependentUpon>202503110150426_updateUsers.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -18,5 +18,18 @@ namespace Sem3EProjectOnlineCPFH.Models
         {
             return new ApplicationDbContext();
         }
+
+        // Add a new DbSet
+        public DbSet<UserProfile> UserProfiles { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // One-to-One Relationship
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOptional(u => u.UserProfile)
+                .WithRequired(p => p.ApplicationUser);
+        }
     }
 }
