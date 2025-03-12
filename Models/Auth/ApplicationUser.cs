@@ -33,6 +33,9 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
 
+        public string EmailConfirmationCode { get; set; }
+        public DateTime? CodeExpirationTime { get; set; }
+
         //
         public virtual UserProfile UserProfile { get; set; }
     }

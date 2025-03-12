@@ -9,33 +9,44 @@ using System.Configuration;
 
 namespace Sem3EProjectOnlineCPFH.Services
 {
-	public class EmailService
-	{
-		private readonly string _email = ConfigurationManager.AppSettings["EmailUsername"];
-        private readonly string _password = ConfigurationManager.AppSettings["EmailPassword"];
-        private readonly string _host = ConfigurationManager.AppSettings["EmailHost"];
-        private readonly int _port = Convert.ToInt32(ConfigurationManager.AppSettings["EmailPort"]);
-        private readonly bool _enableSSL = Convert.ToBoolean(ConfigurationManager.AppSettings["EmailEnableSSL"]);
-
+    public class EmailService
+    {
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
             try
             {
-                using (var client = new SmtpClient(_host, _port))
+                // Lấy cấu hình SMTP từ web.config
+                var fromEmail = ConfigurationManager.AppSettings["EmailUsername"];
+                var password = ConfigurationManager.AppSettings["EmailPassword"];
+                var smtpHost = ConfigurationManager.AppSettings["EmailHost"];
+                var smtpPort = int.Parse(ConfigurationManager.AppSettings["EmailPort"]);
+                var enableSSL = bool.Parse(ConfigurationManager.AppSettings["EnableSSL"]);
+
+                var smtpClient = new SmtpClient(smtpHost)
                 {
-                    client.Credentials = new NetworkCredential(_email, _password);
-                    client.EnableSsl = _enableSSL;
+                    Port = smtpPort,
+                    Credentials = new NetworkCredential(fromEmail, password),
+                    EnableSsl = enableSSL // Kích hoạt SSL/TLS
+                };
 
-                    var mailMessage = new MailMessage(_email, toEmail, subject, body);
-                    mailMessage.IsBodyHtml = true;
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(fromEmail, "Hyprics"),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = true
+                };
+                mailMessage.To.Add(toEmail);
 
-                    await client.SendMailAsync(mailMessage);
-                }
-            }   
-            catch (Exception ex)
+                await smtpClient.SendMailAsync(mailMessage);
+                System.Diagnostics.Debug.WriteLine("Email sent successfully to " + toEmail);
+            }
+            catch (SmtpException ex)
             {
                 System.Diagnostics.Debug.WriteLine("Email Error: " + ex.Message);
+                throw;
             }
         }
     }
+
 }

@@ -194,6 +194,10 @@
     <Compile Include="Migrations\202503110150426_updateUsers.Designer.cs">
       <DependentUpon>202503110150426_updateUsers.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503121626228_addemailconformcode.cs" />
+    <Compile Include="Migrations\202503121626228_addemailconformcode.Designer.cs">
+      <DependentUpon>202503121626228_addemailconformcode.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Auth\ApplicationRoleManager.cs" />
@@ -203,6 +207,7 @@
     <Compile Include="Models\Auth\ProfileSettingsViewModel.cs" />
     <Compile Include="Models\Auth\ProfileViewModel.cs" />
     <Compile Include="Models\Auth\RegisterViewModel.cs" />
+    <Compile Include="Models\Auth\VerifyEmailViewModel.cs" />
     <Compile Include="Models\user\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EmailService.cs" />
@@ -244,6 +249,7 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\_HomeOnlyTopNavLayoutPage.cshtml" />
     <Content Include="Views\Account\ProfileSetting.cshtml" />
+    <Content Include="Views\Account\VerifyEmail.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -271,6 +277,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503110150426_updateUsers.resx">
       <DependentUpon>202503110150426_updateUsers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503121626228_addemailconformcode.resx">
+      <DependentUpon>202503121626228_addemailconformcode.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

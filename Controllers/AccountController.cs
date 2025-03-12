@@ -10,6 +10,7 @@ using System.Web;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Linq;
+using Sem3EProjectOnlineCPFH.Services;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -81,7 +82,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 City = model.City,
                 Country = model.Country,
                 CreatedAt = DateTime.UtcNow,
-                IsActive = true
+                IsActive = false
             };
 
             var result = await UserManager.CreateAsync(user, model.Password);
@@ -138,18 +139,136 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(model);
             }
 
-            // Đăng nhập người dùng sau khi đăng ký
+            //// Đăng nhập người dùng sau khi đăng ký
+            //try
+            //{
+            //    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+            //    System.Diagnostics.Debug.WriteLine("User signed in successfully.");
+            //}
+            //catch (Exception ex)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("SignInManager Error: " + ex.Message);
+            //}
+
+            //return RedirectToAction("Index", "Home");
+
             try
             {
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                System.Diagnostics.Debug.WriteLine("User signed in successfully.");
+                // **Tạo mã PIN 6 số**
+                var random = new Random();
+                var pinCode = random.Next(100000, 999999).ToString();
+
+                using (var db = new ApplicationDbContext())
+                {
+                    var createdUser = db.Users.Find(user.Id);
+                    if (createdUser != null)
+                    {
+                        createdUser.EmailConfirmationCode = pinCode;
+                        createdUser.CodeExpirationTime = DateTime.UtcNow.AddMinutes(10); // Mã hết hạn sau 10 phút
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error: User not found in the database.");
+                        TempData["ErrorMessage"] = "An error occurred while generating the verification code. Please try again.";
+                        return RedirectToAction("Register");
+                    }
+                }
+
+                // **Gửi mã PIN qua email**
+                var emailService = new EmailService();
+                await emailService.SendEmailAsync(user.Email, "Your Verification Code",
+                    $"Your verification code is: <b>{pinCode}</b>. The code is valid for 10 minutes.");
+
+                TempData["InfoMessage"] = "A verification code has been sent to your email. Please enter it below.";
+                return RedirectToAction("VerifyEmail", new { userId = user.Id });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("SignInManager Error: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Error in sending verification code: " + ex.Message);
+                TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
+                return RedirectToAction("Register");
             }
 
-            return RedirectToAction("Index", "Home");
+        }
+
+        //GET: VerifyEmail
+        [HttpGet]
+        [AllowAnonymous]
+        public ActionResult VerifyEmail(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login");
+
+            return View(new VerifyEmailViewModel { UserId = userId });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult VerifyEmail(VerifyEmailViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Invalid input!";
+                return View(model);
+            }
+
+            using (var db = new ApplicationDbContext())
+            {
+                var user = db.Users.Find(model.UserId);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return View(model);
+                }
+
+                // Kiểm tra mã PIN có khớp và chưa hết hạn không
+                if (user.EmailConfirmationCode != model.Code || user.CodeExpirationTime < DateTime.UtcNow)
+                {
+                    TempData["ErrorMessage"] = "Invalid or expired code.";
+                    return View(model);
+                }
+
+                // Đánh dấu email đã xác thực
+                user.EmailConfirmed = true;
+                user.IsActive = true;
+                user.EmailConfirmationCode = null; // Xóa mã PIN sau khi xác thực thành công
+                user.CodeExpirationTime = null;
+                db.SaveChanges();
+
+                TempData["SuccessMessage"] = "Email verified successfully! You can now log in.";
+                return RedirectToAction("Login");
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult> ResendVerificationCode(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login");
+
+            using (var db = new ApplicationDbContext())
+            {
+                var user = db.Users.Find(userId);
+                if (user == null)
+                    return RedirectToAction("Login");
+
+                var random = new Random();
+                var newPin = random.Next(100000, 999999).ToString();
+
+                user.EmailConfirmationCode = newPin;
+                user.CodeExpirationTime = DateTime.UtcNow.AddMinutes(10);
+                db.SaveChanges();
+
+                var emailService = new EmailService();
+                await emailService.SendEmailAsync(user.Email, "Your New Verification Code",
+                    $"Your new verification code is: <b>{newPin}</b>. The code is valid for 10 minutes.");
+
+                TempData["SuccessMessage"] = "A new verification code has been sent.";
+                return RedirectToAction("VerifyEmail", new { userId = user.Id });
+            }
         }
 
 

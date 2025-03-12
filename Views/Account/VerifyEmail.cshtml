@@ -1,0 +1,90 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Auth.VerifyEmailViewModel
+
+@{
+    ViewBag.Title = "Verify Your Email";
+    Layout = "~/Views/Shared/_AccountLayoutPage.cshtml";
+}
+
+<style>
+    .verify-container {
+        max-width: 400px;
+        margin: 50px auto;
+    }
+
+    .verify-card {
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        padding: 25px;
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    .btn-primary {
+        background-color: #2da44e;
+        border: none;
+        font-size: 16px;
+        padding: 10px;
+        width: 100%;
+        border-radius: 6px;
+        transition: background 0.3s;
+    }
+
+        .btn-primary:hover {
+            background-color: #218838;
+        }
+
+    .resend-link {
+        display: block;
+        text-align: center;
+        margin-top: 10px;
+        color: #0366d6;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="verify-container d-flex flex-column align-items-center">
+    <img src="@Url.Content(ViewBag.WebIcon)" class="" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
+    <h3 class="text-center mt-2">Confirm Your Email</h3>
+    <div class="verify-card">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @using (Html.BeginForm("VerifyEmail", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.UserId)
+
+            <div class="mb-3">
+                <label for="Code" class="form-label">Enter Verification Code</label>
+                @Html.TextBoxFor(model => model.Code, new { @class = "form-control text-center", placeholder = "6-digit code", required = "required" })
+            </div>
+
+            <button type="submit" class="btn btn-primary">Verify</button>
+        }
+
+        <br />
+        <p style="color: #808080">We have sent a 6 digit code to your email.</p>
+        <a href="@Url.Action("ResendVerificationCode", "Account", new { userId = Model.UserId })" class="resend-link">Didn't receive a code? Resend</a>
+    </div>
+</div>
