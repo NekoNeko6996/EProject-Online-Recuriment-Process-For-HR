@@ -21,5 +21,8 @@ public class BaseController : Controller
                 ViewBag.CurrentUser = user;
             }
         }
+
+        ViewBag.WebsiteName = "Hyprics";
+        ViewBag.WebIcon = "~/Content/Resources/WebLogo.png";
     }
 }

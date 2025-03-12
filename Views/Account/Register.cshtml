@@ -6,8 +6,8 @@
 }
 
 <div class="container d-flex align-items-center flex-column mt-5">
-    <img src="@Url.Content("~/Content/Resources/Icons/hazard-warning.webp")" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
-    <h3 class="text-center mb-4">Sign Up To MyWebsite</h3>
+    <img src="@Url.Content(ViewBag.WebIcon)" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
+    <h3 class="text-center mb-4 mt-2">Sign Up To @ViewBag.WebsiteName</h3>
     <div class="card p-4" style="max-width: 400px; width: 100%;">
 
         @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))

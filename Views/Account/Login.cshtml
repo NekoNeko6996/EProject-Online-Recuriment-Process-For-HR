@@ -6,8 +6,8 @@
 }
 
 <div class="container d-flex align-items-center flex-column mt-5">
-    <img src="@Url.Content("~/Content/Resources/DefaultImg.png")" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
-    <h3 class="text-center">Login To {Web Name}</h3>
+    <img src="@Url.Content(ViewBag.WebIcon)" class="" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
+    <h3 class="text-center mt-2">Login To @ViewBag.WebsiteName</h3>
     <div class="card p-4 mt-4" style="max-width: 400px; width: 100%;">
         @if (TempData["ErrorMessage"] != null)
         {
