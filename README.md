@@ -9,7 +9,7 @@
 5. Install-Package Microsoft.AspNet.Identity.Owin
 
 ## Init dự án này
-- khởi tạo database
+khởi tạo database
   1. mở nutget package manager console
   2. chạy:
      ```
