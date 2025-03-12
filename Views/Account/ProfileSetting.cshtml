@@ -181,26 +181,79 @@ else
 
             <!-- Avatar Section -->
             <div class="col-md-3 d-flex align-items-center flex-column position-relative">
-                <img src="@Url.Content(Model.ProfileUpdate.AvatarUrl ?? "~/Content/Resources/DefaultImg.png")"
-                     alt="Profile Avatar"
-                     class="img-thumbnail rounded-circle"
-                     style="width: 150px; height: 150px;">
-                <label for="setting-input-avatar" id="setting-input-avatar-label" class="position-absolute top-0 d-flex justify-content-center align-items-center" style="cursor: pointer; width: 150px; aspect-ratio:1/1">
-                    <i class="fa-solid fa-camera"></i>
-                </label>
-                <form action="@Url.Action("UploadAvatar", "Account")" method="post" enctype="multipart/form-data" class="mt-3">
-                    @Html.AntiForgeryToken()
-                    <input type="file" name="avatar" id="setting-input-avatar" class="form-control mb-2" hidden>
-                    <button type="submit" class="btn btn-outline-primary btn-sm">Upload New Photo</button>
-                </form>
+                <h4 class="w-100">Avatar</h4>
+                <div class="d-flex align-items-center position-relative">
+                    <img id="avatarPreview" src="@Url.Content(Model.ProfileUpdate.AvatarUrl ?? "~/Content/Resources/DefaultImg.png")"
+                         alt="Profile Avatar"
+                         class="img-thumbnail rounded-circle"
+                         style="width: 150px; height: 150px; cursor: pointer;">
+                    <label for="setting-input-avatar" id="setting-input-avatar-label" class="position-absolute top-0 d-flex justify-content-center align-items-center" style="width: 150px; aspect-ratio: 1/1; font-size: 30px; cursor: pointer;">
+                        <i class="fa-solid fa-camera"></i>
+                    </label>
+                </div>
+
+                <input type="file" name="avatar" id="setting-input-avatar" class="d-none" accept="image/png, image/jpeg">
+
+                <div id="previewModal" class="modal fade" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Preview Avatar</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="previewImage" src="" class="img-thumbnail" style="max-width: 100%; height: auto;">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button id="confirmUploadBtn" type="button" class="btn btn-primary">Confirm Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    //avatar upload form
+    <form id="uploadForm" action="@Url.Action("UploadAvatar", "Account")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="file" name="avatar" id="uploadFileInput" class="d-none">
+    </form>
+
 
     <br />
     <br />
     <br />
 }
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const avatarPreview = document.getElementById("avatarPreview");
+        const fileInput = document.getElementById("setting-input-avatar");
+        const previewImage = document.getElementById("previewImage");
+        const confirmUploadBtn = document.getElementById("confirmUploadBtn");
+        const uploadForm = document.getElementById("uploadForm");
+        const uploadFileInput = document.getElementById("uploadFileInput");
+
+        fileInput.addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    new bootstrap.Modal(document.getElementById('previewModal')).show();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        confirmUploadBtn.addEventListener("click", function () {
+            uploadFileInput.files = fileInput.files;
+            uploadForm.submit();
+        });
+    });
+</script>
 
 <script>
     function showSection(sectionId) {
