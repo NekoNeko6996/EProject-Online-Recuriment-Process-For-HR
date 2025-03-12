@@ -267,7 +267,6 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 user.Address = model.ProfileUpdate.Address;
                 user.City = model.ProfileUpdate.City;
                 user.Country = model.ProfileUpdate.Country;
-                user.UserProfile.AvatarUrl = model.ProfileUpdate.AvatarUrl;
                 user.UserProfile.Bio = model.ProfileUpdate.Bio;
                 user.UserProfile.SocialAccount1 = model.ProfileUpdate.SocialAccount1;
                 user.UserProfile.SocialAccount2 = model.ProfileUpdate.SocialAccount2;
