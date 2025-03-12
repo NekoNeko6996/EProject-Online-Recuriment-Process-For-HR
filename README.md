@@ -14,6 +14,10 @@
   2. chạy:
      ```
      Enable-migrations
+     ```
+     ```
      Add-migration init
+     ```
+     ```
      Update-database
      ```
