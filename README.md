@@ -7,3 +7,13 @@
 3. FontAwesome
 4. Microsoft.AspNet.Identity.EntityFramework
 5. Install-Package Microsoft.AspNet.Identity.Owin
+
+## Init dự án này
+- khởi tạo database
+  1. mở nutget package manager console
+  2. chạy:
+     ```
+     Enable-migrations
+     Add-migration init
+     Update-database
+     ```
