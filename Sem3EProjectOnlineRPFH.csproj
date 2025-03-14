@@ -198,6 +198,10 @@
     <Compile Include="Migrations\202503121626228_addemailconformcode.Designer.cs">
       <DependentUpon>202503121626228_addemailconformcode.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503140200248_update_1403_09_00.cs" />
+    <Compile Include="Migrations\202503140200248_update_1403_09_00.Designer.cs">
+      <DependentUpon>202503140200248_update_1403_09_00.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Auth\ApplicationRoleManager.cs" />
@@ -280,6 +284,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503121626228_addemailconformcode.resx">
       <DependentUpon>202503121626228_addemailconformcode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503140200248_update_1403_09_00.resx">
+      <DependentUpon>202503140200248_update_1403_09_00.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

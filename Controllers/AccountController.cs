@@ -139,19 +139,6 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(model);
             }
 
-            //// Đăng nhập người dùng sau khi đăng ký
-            //try
-            //{
-            //    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-            //    System.Diagnostics.Debug.WriteLine("User signed in successfully.");
-            //}
-            //catch (Exception ex)
-            //{
-            //    System.Diagnostics.Debug.WriteLine("SignInManager Error: " + ex.Message);
-            //}
-
-            //return RedirectToAction("Index", "Home");
-
             try
             {
                 // **Tạo mã PIN 6 số**
@@ -381,7 +368,6 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 }
                 user.FirstName = model.ProfileUpdate.FirstName;
                 user.LastName = model.ProfileUpdate.LastName;
-                user.Email = model.ProfileUpdate.Email;
                 user.PhoneNumber = model.ProfileUpdate.PhoneNumber;
                 user.Address = model.ProfileUpdate.Address;
                 user.City = model.ProfileUpdate.City;
