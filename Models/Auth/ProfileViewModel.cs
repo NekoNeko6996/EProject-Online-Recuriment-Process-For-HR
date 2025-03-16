@@ -24,9 +24,5 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
         public string SocialAccount1 { get; set; }
         public string SocialAccount2 { get; set; }
         public string SocialAccount3 { get; set; }
-
-        public string Address { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
     }
 }

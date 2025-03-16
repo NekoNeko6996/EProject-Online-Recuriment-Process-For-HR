@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "Manage User Account";
+    Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
+}
+
+<style>
+    td, th {
+        vertical-align: middle !important;
+        white-space: nowrap;
+    }
+</style>
+<div class="container">
+    <h2 class="mt-3">User Management</h2>
+    <hr />
+    @if (ViewBag.Users != null)
+    {
+        <div class="d-flex flex-row justify-content-between mb-3">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fa-solid fa-user-plus"></i> Add New User
+            </button>
+
+            <!-- Dropdown menu for mobile view -->
+            <div class="d-block d-md-none">
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+                <ul class="dropdown-menu p-3">
+                    <li>
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="value">text</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="input-group mb-2">
+                            <input type="search" class="form-control" placeholder="Search name, email or id" aria-label="Search" style="width: 200px!important;" />
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Normal view for desktop -->
+            <form class="d-none d-md-flex flex-row gap-4">
+                <div class="input-group">
+                    <select class="form-select">
+                        <option value="value">text</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="search" class="form-control" placeholder="Search" aria-label="Search" />
+                    <button type="button" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Created At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                    @foreach (var user in ViewBag.Users)
+                    {
+                        <tr>
+                            <td>@user.Id</td>
+                            <td style="text-align: left;">@user.FirstName @user.LastName</td>
+                            <td style="text-align: left;">@user.Email</td>
+                            <td>@(user.PhoneNumber ?? "N/A")</td>
+                            <td>@user.RoleName</td>
+                            <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="d-flex gap-2 justify-content-center">
+                                <a href="@Url.Action("ViewUser", "Account", new { id = user.Id })" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="@Url.Action("EditUser", "Account", new { id = user.Id })" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                @using (Html.BeginForm("DeleteUser", "Account", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item"><a class="page-link" href="#" id="prevPage"><i class="fa-solid fa-backward"></i></a></li>
+                <li class="page-item active"><a class="page-link" href="#" id="currentPage">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" id="nextPage"><i class="fa-solid fa-forward"></i></a></li>
+            </ul>
+        </nav>
+    }
+</div>
+<!-- Lọc dữ liệu với JavaScript -->
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('#userTable tr');
+
+    searchInput.addEventListener('keyup', function () {
+        const searchValue = searchInput.value.toLowerCase();
+        tableRows.forEach(row => {
+            const rowData = row.textContent.toLowerCase();
+            row.style.display = rowData.includes(searchValue) ? '' : 'none';
+        });
+    });
+</script>

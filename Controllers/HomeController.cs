@@ -16,6 +16,9 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         // GET: Home
         public ActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+
             return View();
         }
 

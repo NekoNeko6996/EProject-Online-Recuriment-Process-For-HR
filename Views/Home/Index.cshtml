@@ -1,8 +1,29 @@
 ﻿
 @{
     ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
+    Layout = "~/Views/Shared/_AccountLayoutPage.cshtml";
 }
 
-<p>Index</p>
+<div class="container d-flex flex-column justify-content-center align-items-center mt-5">
+    <h1 class="mb-4">Welcome to Hyprics!</h1>
+    @if (!ViewBag.AnyUserInDb)
+    {
+        <p class="lead mb-4">No users have been granted permission yet. Click register to create your first user.</p>
+    }
+    else
+    {
+        <p class="lead mb-4">First, Click Login or Helper to start.</p>
+    }
 
+    <div class="d-flex gap-3">
+        @if (ViewBag.AnyUserInDb)
+        {
+            <a href="/Account/Login" class="btn btn-primary">Login</a>
+        }
+        else
+        {
+            <a href="/Account/Register" class="btn btn-primary">Register</a>
+        }
+        <a href="/Home/Helper" class="btn btn-outline-secondary">Helper</a>
+    </div>
+</div>

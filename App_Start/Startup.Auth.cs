@@ -18,7 +18,8 @@ namespace Sem3EProjectOnlineCPFH
                 LoginPath = new PathString("/Account/Login"),  // Trang login mặc định
                 LogoutPath = new PathString("/Account/Logout"),
                 ExpireTimeSpan = TimeSpan.FromMinutes(60),  // Hết hạn sau 60 phút
-                SlidingExpiration = true
+                SlidingExpiration = true,
+                CookieSecure = CookieSecureOption.SameAsRequest
             });
         }
     }

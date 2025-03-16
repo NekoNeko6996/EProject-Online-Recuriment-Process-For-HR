@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Profile Settings";
-    Layout = "~/Views/Shared/_HomeOnlyTopNavLayoutPage.cshtml";
+    Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
 }
 
 @if (Model == null)
@@ -108,25 +108,6 @@ else
                         <div class="mb-3">
                             @Html.LabelFor(model => model.ProfileUpdate.Bio, new { @class = "form-label" })
                             @Html.TextAreaFor(model => model.ProfileUpdate.Bio, new { @class = "form-control", rows = "3", placeholder = "Tell us something about yourself..." })
-                        </div>
-
-                        <hr>
-
-                        <!-- Address -->
-                        <h5>Address</h5>
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.ProfileUpdate.Address, new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.ProfileUpdate.Address, new { @class = "form-control" })
-                        </div>
-
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.ProfileUpdate.City, new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.ProfileUpdate.City, new { @class = "form-control" })
-                        </div>
-
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.ProfileUpdate.Country, new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.ProfileUpdate.Country, new { @class = "form-control" })
                         </div>
 
                         <hr>

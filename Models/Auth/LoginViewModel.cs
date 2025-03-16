@@ -13,6 +13,6 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
 
         [DataType(DataType.Password), Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
-        public bool RememberMe { get; set; }
+        public bool RememberMe { get; set; } = false;
     }
 }

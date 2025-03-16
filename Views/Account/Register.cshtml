@@ -6,16 +6,15 @@
 }
 
 <div class="container d-flex align-items-center flex-column mt-5">
-    <img src="@Url.Content(ViewBag.WebIcon)" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
-    <h3 class="text-center mb-4 mt-2">Sign Up To @ViewBag.WebsiteName</h3>
+    @*<img src="@Url.Content(ViewBag.WebIcon)" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />*@
+    <h3 class="text-center mb-4 mt-2">Create First Account</h3>
+    <div class="alert alert-danger" style="text-align:center">!Important, this is the first time accessing the system, this account will be granted administrative rights. Please be very careful, after successfully creating an account, you will not be able to access this page again.</div>
     <div class="card p-4" style="max-width: 400px; width: 100%;">
 
         @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
         {
             @Html.AntiForgeryToken()
-
-            <!-- Step 1: Personal Info -->
-            <div id="step1">
+            <div>
                 <div class="mb-3">
                     @Html.LabelFor(model => model.FirstName, "First Name", new { @class = "form-label" })
                     @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control", placeholder = "Enter first name", required = "required" })
@@ -53,52 +52,9 @@
                 </div>
 
                 <div class="d-grid">
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
-                </div>
-            </div>
-
-            <!-- Step 2: Address Info -->
-            <div id="step2" style="display: none;">
-                <div class="mb-3">
-                    @Html.LabelFor(model => model.Address, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Address, new { @class = "form-control", placeholder = "Enter your address", required = "required" })
-                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="mb-3">
-                    @Html.LabelFor(model => model.City, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.City, new { @class = "form-control", placeholder = "Enter your city", required = "required" })
-                    @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="mb-3">
-                    @Html.LabelFor(model => model.Country, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Country, new { @class = "form-control", placeholder = "Enter your country", required = "required" })
-                    @Html.ValidationMessageFor(model => model.Country, "", new { @class = "text-danger" })
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
                     <button type="submit" class="btn btn-primary">Sign Up</button>
                 </div>
             </div>
         }
     </div>
-
-    <div class="card mt-4 p-3" style="max-width: 400px; width: 100%;">
-        <p class="text-center m-0">Already have an account? <a href="@Url.Action("Login", "Account")" class="text-decoration-none">Log in</a></p>
-    </div>
 </div>
-
-<!-- JavaScript for Step Navigation -->
-<script>
-    function nextStep() {
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "block";
-    }
-
-    function prevStep() {
-        document.getElementById("step2").style.display = "none";
-        document.getElementById("step1").style.display = "block";
-    }
-</script>

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNet.Identity;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Sem3EProjectOnlineCPFH.Models;
 
@@ -15,28 +18,25 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
         [StringLength(50)]
         public string LastName { get; set; }
 
-        [Required]
-        [StringLength(200)] // Tối đa 200 ký tự
-        public string Address { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string City { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string Country { get; set; }
-
-        [StringLength(10)]
-        public string PostalCode { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
 
-        public string EmailConfirmationCode { get; set; }
-        public DateTime? CodeExpirationTime { get; set; }
-
         //
         public virtual UserProfile UserProfile { get; set; }
+
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
+        {
+            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+
+            // Thêm Role vào Claims
+            var roles = await manager.GetRolesAsync(this.Id);
+            foreach (var role in roles)
+            {
+                userIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+
+            return userIdentity;
+        }
+
     }
 }

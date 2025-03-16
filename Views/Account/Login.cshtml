@@ -6,7 +6,7 @@
 }
 
 <div class="container d-flex align-items-center flex-column mt-5">
-    <img src="@Url.Content(ViewBag.WebIcon)" class="" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />
+    @*<img src="@Url.Content(ViewBag.WebIcon)" class="" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />*@
     <h3 class="text-center mt-2">Login To @ViewBag.WebsiteName</h3>
     <div class="card p-4 mt-4" style="max-width: 400px; width: 100%;">
         @if (TempData["SuccessMessage"] != null)
@@ -33,13 +33,14 @@
                 @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
             </div>
 
+            <div class="mb-3">
+                @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.RememberMe, "Remember Me", new { @class = "form-check-label" })
+            </div>
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Login</button>
             </div>
         }
-    </div>
-
-    <div class="card mt-4 p-3" style="max-width: 400px; width: 100%;">
-        <p class="text-center m-0">A New Member? <a href="@Url.Action("Register", "Account")" class="text-decoration-none">Create new account!</a></p>
     </div>
 </div>
