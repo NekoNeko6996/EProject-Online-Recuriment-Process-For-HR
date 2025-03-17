@@ -31,5 +31,11 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             ViewBag.Users = users;
             return View(users);
         }
+
+        // GET: Add new user
+        public ActionResult AddUser()
+        {
+            return View();
+        }
     }
 }
