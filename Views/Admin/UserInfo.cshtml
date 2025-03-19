@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "UserInfo";
+    Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
+}
+
+<h2>UserInfo</h2>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4 text-center border rounded">
+            <img src="@Url.Content(ViewBag.DefaultAvatar)" alt="User Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
+            <h4 id="username">John Doe</h4>
+            <p id="bio">Full Stack Developer | Tech Enthusiast</p>
+        </div>
+        <div class="col-md-8">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>ID:</strong> <span id="userId">12345</span></li>
+                <li class="list-group-item"><strong>Email:</strong> <span id="email">johndoe@example.com</span></li>
+                <li class="list-group-item"><strong>Phone Number:</strong> <span id="phone">+123456789</span></li>
+            </ul>
+        </div>
+    </div>
+</div>

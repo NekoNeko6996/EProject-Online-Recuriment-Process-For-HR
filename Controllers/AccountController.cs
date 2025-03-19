@@ -10,6 +10,7 @@ using System.Web;
 using System;
 using System.Linq;
 using Sem3EProjectOnlineCPFH.Services;
+using System.Data.Entity;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -159,6 +160,14 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         {
             if(User.Identity.IsAuthenticated)
             {
+                var user = UserManager.FindById(User.Identity.GetUserId());
+                if (user == null)
+                {
+                    AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                    TempData["ErrorMessage"] = "User not found!";
+                    return View();
+                }
+
                 string roleName = UserManager.GetRoles(User.Identity.GetUserId()).FirstOrDefault();
                 SetDefaultPage(roleName);
                 RedirectToAction(ViewBag.Page, ViewBag.Controller);
@@ -202,14 +211,13 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                     default:
                         SetDefaultPage(null);
-                        return RedirectToAction("Unauthorized", "Account");
+                        return RedirectToAction("Unauthorized", "Default");
                 }
             }
 
             TempData["ErrorMessage"] = "Invalid Email or Password";
             return View(model);
         }
-
 
         //POST: Logout
         [HttpPost]
@@ -235,16 +243,25 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         }
 
         // GET: Account Setting
-        public ActionResult ProfileSetting()
+        public ActionResult ProfileSetting(String id)
         {
+            if (id == null) id = User.Identity.GetUserId();
+            else
+            {
+                if (!User.IsInRole("admin"))
+                {
+                    TempData["ErrorMessage"] = "You are not authorized to view this page.";
+                    return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+                }
+            }
             using (var db = new ApplicationDbContext())
             {
-                var user = db.Users.Find(User.Identity.GetUserId());
+                var user = db.Users.Find(id);
                 if (user == null)
                 {
                     return HttpNotFound();
                 }
-                var model = new ProfileViewModel
+                var profile = new ProfileViewModel
                 {
                     AvatarUrl = user.UserProfile.AvatarUrl,
                     FirstName = user.FirstName,
@@ -255,12 +272,18 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     SocialAccount1 = user.UserProfile.SocialAccount1,
                     SocialAccount2 = user.UserProfile.SocialAccount2,
                     SocialAccount3 = user.UserProfile.SocialAccount3,
+                    Id = id
+                };
+
+                var changePassword = new ChangePasswordViewModel
+                {
+                    Id = User.Identity.GetUserId()
                 };
 
                 ProfileSettingsViewModel profileSettings = new ProfileSettingsViewModel
                 {
-                    ProfileUpdate = model,
-                    ChangePassword = new ChangePasswordViewModel()
+                    ProfileUpdate = profile,
+                    ChangePassword = changePassword
                 };
 
                 return View(profileSettings);
@@ -272,6 +295,14 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateProfile(ProfileSettingsViewModel model)
         {
+            string id = model.ProfileUpdate.Id ?? User.Identity.GetUserId();
+
+            if (model.ProfileUpdate.Id != null && !User.IsInRole("admin"))
+            {
+                TempData["ErrorMessage"] = "You are not authorized to update this profile.";
+                return RedirectToAction("ProfileSetting");
+            }
+
             if (!ModelState.IsValid)
             {
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
@@ -279,29 +310,45 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     System.Diagnostics.Debug.WriteLine("Validation Error: " + error.ErrorMessage);
                 }
                 TempData["ErrorMessage"] = "Invalid input, Please Try Again...";
-                return View("ProfileSetting", new ProfileSettingsViewModel { ProfileUpdate = model.ProfileUpdate});
+                return View("ProfileSetting", new ProfileSettingsViewModel { ProfileUpdate = model.ProfileUpdate });
             }
 
-            // Update profile
             using (var db = new ApplicationDbContext())
             {
-                var user = db.Users.Find(User.Identity.GetUserId());
+                var user = db.Users.Include("UserProfile").FirstOrDefault(u => u.Id == id);
                 if (user == null)
                 {
                     return HttpNotFound();
                 }
+
                 user.FirstName = model.ProfileUpdate.FirstName;
                 user.LastName = model.ProfileUpdate.LastName;
                 user.PhoneNumber = model.ProfileUpdate.PhoneNumber;
+
+                if (user.UserProfile == null)
+                {
+                    user.UserProfile = new UserProfile();
+                }
+
                 user.UserProfile.Bio = model.ProfileUpdate.Bio;
                 user.UserProfile.SocialAccount1 = model.ProfileUpdate.SocialAccount1;
                 user.UserProfile.SocialAccount2 = model.ProfileUpdate.SocialAccount2;
                 user.UserProfile.SocialAccount3 = model.ProfileUpdate.SocialAccount3;
+
                 db.SaveChanges();
                 System.Diagnostics.Debug.WriteLine("Profile updated successfully for: " + user.Email);
             }
+
             TempData["SuccessMessage"] = "Profile updated successfully!";
-            return RedirectToAction("ProfileSetting");
+            if (id == User.Identity.GetUserId())
+            {
+                return RedirectToAction("ProfileSetting");
+            }
+            else
+            {
+                TempData["SuccessMessage"] = $"Updated Profile [{id}] successfully!";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
         }
 
         // POST: Account Setting [change password]

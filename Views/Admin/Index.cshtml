@@ -12,53 +12,66 @@
 <div class="container">
     <h2 class="mt-3">User Management</h2>
     <hr />
-    @if (ViewBag.Users != null)
-    {
-        <div class="d-flex flex-row justify-content-between mb-3">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                <i class="fa-solid fa-user-plus"></i> Add New User
+    <div class="d-flex flex-row justify-content-between mb-3">
+        <a class="btn btn-primary" href="@Url.Action("AddUser", "Admin")">
+            <i class="fa-solid fa-user-plus"></i> Add New User
+        </a>
+        <!-- Dropdown menu for mobile view -->
+        <div class="d-block d-md-none">
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-filter"></i> Filter
             </button>
-
-            <!-- Dropdown menu for mobile view -->
-            <div class="d-block d-md-none">
-                <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa-solid fa-filter"></i> Filter
-                </button>
-                <ul class="dropdown-menu p-3">
-                    <li>
-                        <div class="input-group">
-                            <select class="form-select">
-                                <option value="value">text</option>
-                            </select>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="input-group mb-2">
-                            <input type="search" class="form-control" placeholder="Search name, email or id" aria-label="Search" style="width: 200px!important;" />
-                            <button type="button" class="btn btn-outline-primary">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Normal view for desktop -->
-            <form class="d-none d-md-flex flex-row gap-4">
-                <div class="input-group">
-                    <select class="form-select">
-                        <option value="value">text</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <input type="search" class="form-control" placeholder="Search" aria-label="Search" />
-                    <button type="button" class="btn btn-outline-primary">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </div>
-            </form>
+            <ul class="dropdown-menu p-3">
+                <li>
+                    <div class="input-group">
+                        <select class="form-select">
+                            <option value="value">text</option>
+                        </select>
+                    </div>
+                </li>
+                <li>
+                    <div class="input-group mb-2">
+                        <input type="search" class="form-control" placeholder="Search name, email or id" aria-label="Search" style="width: 200px!important;" />
+                        <button type="button" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </li>
+            </ul>
         </div>
+        <!-- Normal view for desktop -->
+        <form class="d-none d-md-flex flex-row gap-4">
+            <div class="input-group">
+                <select class="form-select">
+                    <option value="value">text</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <input type="search" class="form-control" placeholder="Search" aria-label="Search" />
+                <button type="button" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    }
+
+    @if (ViewBag.Users != null && ViewBag.Users.Count > 1)
+    {
         <div class="table-responsive">
             <table class="table table-hover table-bordered text-center">
                 <thead class="table-dark">
@@ -75,6 +88,10 @@
                 <tbody id="userTable">
                     @foreach (var user in ViewBag.Users)
                     {
+                        if (user.Id == ViewBag.UserId) // Bỏ qua user đang đăng nhập
+                        {
+                            continue;
+                        }
                         <tr>
                             <td>@user.Id</td>
                             <td style="text-align: left;">@user.FirstName @user.LastName</td>
@@ -83,11 +100,11 @@
                             <td>@user.RoleName</td>
                             <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
                             <td class="d-flex gap-2 justify-content-center">
-                                <a href="@Url.Action("ViewUser", "Account", new { id = user.Id })" class="btn btn-outline-primary btn-sm">View</a>
-                                <a href="@Url.Action("EditUser", "Account", new { id = user.Id })" class="btn btn-outline-secondary btn-sm">Edit</a>
-                                @using (Html.BeginForm("DeleteUser", "Account", FormMethod.Post))
+                                <a href="@Url.Action("ProfileSetting", "Account")?id=@user.Id" class="btn btn-outline-primary btn-sm">Profile Setting</a>
+                                @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@user.Id" />
                                     <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
                                 }
                             </td>
@@ -96,6 +113,7 @@
                 </tbody>
             </table>
         </div>
+
         <nav>
             <ul class="pagination justify-content-center">
                 <li class="page-item"><a class="page-link" href="#" id="prevPage"><i class="fa-solid fa-backward"></i></a></li>
@@ -104,6 +122,11 @@
             </ul>
         </nav>
     }
+    else
+    {
+        <p class="text-center mt-3">No Other User To Show</p>
+    }
+
 </div>
 <!-- Lọc dữ liệu với JavaScript -->
 <script>

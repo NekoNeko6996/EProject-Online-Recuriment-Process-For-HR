@@ -4,6 +4,7 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
 {
     public class ProfileViewModel
     {
+        public string Id { get; set; }
         public string AvatarUrl { get; set; }
 
         [Required, StringLength(50)]

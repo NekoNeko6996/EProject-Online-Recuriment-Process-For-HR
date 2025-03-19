@@ -51,6 +51,7 @@ public class BaseController : Controller
 
                 ViewBag.CurrentUser = user;
                 ViewBag.CurrentUserRole = roleName;
+                ViewBag.UserId = userId;
 
                 SetDefaultPage(roleName);
             }
@@ -65,5 +66,6 @@ public class BaseController : Controller
         }
         ViewBag.WebsiteName = "Hyprics";
         ViewBag.WebIcon = "~/Content/Resources/WebLogo.png";
+        ViewBag.DefaultAvatar = "~/Content/Resources/DefaultImg.png";
     }
 }

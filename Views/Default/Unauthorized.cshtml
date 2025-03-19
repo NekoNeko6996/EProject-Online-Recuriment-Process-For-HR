@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = "Unauthorized Access";
+    Layout = "~/Views/Shared/_AccountLayoutPage.cshtml";
+}
+
+<div class="container d-flex flex-column justify-content-center align-items-center vh-100">
+    <div class="text-center">
+        <h1 class="display-4 text-danger">403 - Access Denied</h1>
+        <p class="lead">You do not have permission to access this page. Please log in to continue.</p>
+        <a href="/Account/Login" class="btn btn-primary">Login</a>
+        <a href="/Home/Index" class="btn btn-secondary ms-2">Home</a>
+    </div>
+</div>

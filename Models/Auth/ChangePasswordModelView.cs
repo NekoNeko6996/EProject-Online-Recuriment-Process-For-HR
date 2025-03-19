@@ -8,6 +8,7 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
 {
     public class ChangePasswordViewModel
     {
+        public string Id { get; set; }
         [Required, DataType(DataType.Password)]
         public string OldPassword { get; set; }
 
