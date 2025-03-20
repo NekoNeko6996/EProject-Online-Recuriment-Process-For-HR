@@ -197,5 +197,37 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
         }
+
+        // POST: Disable User
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DisableUser(string Id)
+        {
+            if (Id == User.Identity.GetUserId())
+            {
+                TempData["ErrorMessage"] = "You cannot disable yourself!";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+            ApplicationDbContext db = new ApplicationDbContext();
+            var user = db.Users.Find(Id);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found!";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+            try
+            {
+                user.IsActive = !user.IsActive;
+                db.SaveChanges();
+                TempData["SuccessMessage"] = $"Disabled User [{Id}] successfully!";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Disable User Error: " + ex.Message);
+                TempData["ErrorMessage"] = "Disable User Error";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+        }
     }
 }

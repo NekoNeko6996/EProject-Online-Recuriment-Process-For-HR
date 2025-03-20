@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using Sem3EProjectOnlineCPFH.Services;
 using System.Data.Entity;
+using Sem3EProjectOnlineCPFH.Models.User;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -114,7 +115,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 LastName = model.LastName,
                 PhoneNumber = model.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
-                IsActive = false
+                IsActive = true
             };
 
             var result = await UserManager.CreateAsync(user, model.Password);
@@ -186,32 +187,40 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(model);
 
             var user = await UserManager.FindByEmailAsync(model.Email);
-            if (user != null && await UserManager.CheckPasswordAsync(user, model.Password))
+            if (user != null)
             {
-                await SignInAsync(user, model.RememberMe); // Gọi trực tiếp SignInAsync
-
-                var roles = await UserManager.GetRolesAsync(user.Id);
-                var roleName = roles.FirstOrDefault();
-
-                System.Diagnostics.Debug.WriteLine("User logged in: " + user.Email + " Role Name: " + roleName);
-
-                switch (roleName)
+                if (!user.IsActive)
                 {
-                    case "admin":
-                        SetDefaultPage("admin");
-                        return RedirectToAction("Index", "Admin");
+                    TempData["ErrorMessage"] = "Your account is inactive. Please contact support.";
+                    return View(model);
+                }
+                if (await UserManager.CheckPasswordAsync(user, model.Password))
+                {
+                    await SignInAsync(user, model.RememberMe);
 
-                    case "hrgroup":
-                        SetDefaultPage("hrgroup");
-                        return RedirectToAction("Index", "Home");
+                    var roles = await UserManager.GetRolesAsync(user.Id);
+                    var roleName = roles.FirstOrDefault();
 
-                    case "interviewer":
-                        SetDefaultPage("interviewer");
-                        return RedirectToAction("Index", "Home");
+                    System.Diagnostics.Debug.WriteLine("User logged in: " + user.Email + " Role Name: " + roleName);
 
-                    default:
-                        SetDefaultPage(null);
-                        return RedirectToAction("Unauthorized", "Default");
+                    switch (roleName)
+                    {
+                        case "admin":
+                            SetDefaultPage("admin");
+                            return RedirectToAction("Index", "Admin");
+
+                        case "hrgroup":
+                            SetDefaultPage("hrgroup");
+                            return RedirectToAction("Index", "Home");
+
+                        case "interviewer":
+                            SetDefaultPage("interviewer");
+                            return RedirectToAction("Index", "Home");
+
+                        default:
+                            SetDefaultPage(null);
+                            return RedirectToAction("Unauthorized", "Default");
+                    }
                 }
             }
 
@@ -277,7 +286,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                 var changePassword = new ChangePasswordViewModel
                 {
-                    Id = User.Identity.GetUserId()
+                    Id = id,
                 };
 
                 ProfileSettingsViewModel profileSettings = new ProfileSettingsViewModel
@@ -354,7 +363,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         // POST: Account Setting [change password]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ChangePassword(ProfileSettingsViewModel model)
+        public async Task<ActionResult> ChangePassword(ProfileSettingsViewModel form)
         {
             if (!ModelState.IsValid)
             {
@@ -364,43 +373,59 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             try
             {
-                var userId = User.Identity.GetUserId();
-                var result = await UserManager.ChangePasswordAsync(userId, model.ChangePassword.OldPassword, model.ChangePassword.NewPassword);
+                var userId = form.ChangePassword.Id;
+                var result = await UserManager.ChangePasswordAsync(userId, form.ChangePassword.OldPassword, form.ChangePassword.NewPassword);
 
                 if (result.Succeeded)
                 {
-                    TempData["SuccessMessage"] = "Password changed successfully!";
+                    if(userId == User.Identity.GetUserId())
+                    {
+                        TempData["SuccessMessage"] = "Password changed successfully!";
+                        return RedirectToAction("ProfileSetting");
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = $"Changed Password For User [{userId}] Successfully!";
+                        return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+                    }
+                }
+                
+                if(userId == User.Identity.GetUserId())
+                {
+                    TempData["ErrorMessage"] = "Error Changing Password";
                     return RedirectToAction("ProfileSetting");
                 }
-
-                TempData["ErrorMessage"] = string.Join("<br/>", result.Errors);
-                return RedirectToAction("ProfileSetting");
+                else
+                {
+                    TempData["ErrorMessage"] = $"Error Changing Password For User [{userId}]";
+                    return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+                }
             }
             catch (Exception)
             {
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again.";
-                return RedirectToAction("ProfileSetting");
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
         }
 
         // POST: Account Setting [upload avatar]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult UploadAvatar(HttpPostedFileBase avatar)
+        public ActionResult UploadAvatar(UploadAvatarViewModel form)
         {
-            if (avatar == null || avatar.ContentLength == 0)
+            if (form.Avatar == null || form.Avatar.ContentLength == 0)
             {
                 TempData["ErrorMessage"] = "No file selected or file is empty.";
                 return RedirectToAction("ProfileSetting");
             }
 
-            if (avatar.ContentLength > 5 * 1024 * 1024)
+            if (form.Avatar.ContentLength > 5 * 1024 * 1024)
             {
                 TempData["ErrorMessage"] = "File size must be less than 5MB.";
                 return RedirectToAction("ProfileSetting");
             }
 
-            if (!avatar.ContentType.StartsWith("image/"))
+            if (!form.Avatar.ContentType.StartsWith("image/"))
             {
                 TempData["ErrorMessage"] = "Invalid file type. Only images are allowed.";
                 return RedirectToAction("ProfileSetting");
@@ -408,7 +433,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             using (var db = new ApplicationDbContext())
             {
-                var user = db.Users.Find(User.Identity.GetUserId());
+                var user = db.Users.Find(form.Id);
                 if (user == null)
                 {
                     TempData["ErrorMessage"] = "User not found.";
@@ -418,7 +443,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 string oldAvatarPath = Server.MapPath(user.UserProfile.AvatarUrl);
 
                 // Tạo tên file mới
-                string fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(avatar.FileName);
+                string fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(form.Avatar.FileName);
                 string newAvatarPath = System.IO.Path.Combine(Server.MapPath("~/Content/Resources/Avatars"), fileName);
 
                 try
@@ -433,7 +458,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     }
 
                     // Lưu ảnh mới
-                    avatar.SaveAs(newAvatarPath);
+                    form.Avatar.SaveAs(newAvatarPath);
                     user.UserProfile.AvatarUrl = "/Content/Resources/Avatars/" + fileName; // Lưu đường dẫn tương đối
                     db.SaveChanges();
 
@@ -447,7 +472,16 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 }
             }
 
-            return RedirectToAction("ProfileSetting");
+
+            if(form.Id == User.Identity.GetUserId())
+            {
+                return RedirectToAction("ProfileSetting");
+            }
+            else
+            {
+                TempData["SuccessMessage"] = $"Updated Avatar For User [{form.Id}] Successfully!";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
         }
     }
 }

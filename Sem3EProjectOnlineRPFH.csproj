@@ -212,33 +212,10 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Libraries\ApplicationUserManager.cs" />
-    <Compile Include="Migrations\202503080849464_initauth.cs" />
-    <Compile Include="Migrations\202503080849464_initauth.Designer.cs">
-      <DependentUpon>202503080849464_initauth.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503080854581_initauthv1.cs" />
-    <Compile Include="Migrations\202503080854581_initauthv1.Designer.cs">
-      <DependentUpon>202503080854581_initauthv1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503110119482_addprofilev1.cs" />
-    <Compile Include="Migrations\202503110119482_addprofilev1.Designer.cs">
-      <DependentUpon>202503110119482_addprofilev1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503110150426_updateUsers.cs" />
-    <Compile Include="Migrations\202503110150426_updateUsers.Designer.cs">
-      <DependentUpon>202503110150426_updateUsers.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503121626228_addemailconformcode.cs" />
-    <Compile Include="Migrations\202503121626228_addemailconformcode.Designer.cs">
-      <DependentUpon>202503121626228_addemailconformcode.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503140200248_update_1403_09_00.cs" />
-    <Compile Include="Migrations\202503140200248_update_1403_09_00.Designer.cs">
-      <DependentUpon>202503140200248_update_1403_09_00.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202503160202461_update-user-info.cs" />
-    <Compile Include="Migrations\202503160202461_update-user-info.Designer.cs">
-      <DependentUpon>202503160202461_update-user-info.cs</DependentUpon>
+    <Compile Include="Middleware\ActiveUserMiddleware.cs" />
+    <Compile Include="Migrations\202503200314259_InitialMigration.cs" />
+    <Compile Include="Migrations\202503200314259_InitialMigration.Designer.cs">
+      <DependentUpon>202503200314259_InitialMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -252,6 +229,7 @@
     <Compile Include="Models\Auth\RegisterViewModel.cs" />
     <Compile Include="Models\Auth\VerifyEmailViewModel.cs" />
     <Compile Include="Models\User\ManageUserAccountViewModel.cs" />
+    <Compile Include="Models\User\UploadAvatarViewModel.cs" />
     <Compile Include="Models\User\UserId.cs" />
     <Compile Include="Models\User\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -313,26 +291,8 @@
     <Folder Include="Views\Base\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503080849464_initauth.resx">
-      <DependentUpon>202503080849464_initauth.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503080854581_initauthv1.resx">
-      <DependentUpon>202503080854581_initauthv1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503110119482_addprofilev1.resx">
-      <DependentUpon>202503110119482_addprofilev1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503110150426_updateUsers.resx">
-      <DependentUpon>202503110150426_updateUsers.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503121626228_addemailconformcode.resx">
-      <DependentUpon>202503121626228_addemailconformcode.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503140200248_update_1403_09_00.resx">
-      <DependentUpon>202503140200248_update_1403_09_00.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503160202461_update-user-info.resx">
-      <DependentUpon>202503160202461_update-user-info.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202503200314259_InitialMigration.resx">
+      <DependentUpon>202503200314259_InitialMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -101,6 +101,15 @@
                             <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
                             <td class="d-flex gap-2 justify-content-center">
                                 <a href="@Url.Action("ProfileSetting", "Account")?id=@user.Id" class="btn btn-outline-primary btn-sm">Profile Setting</a>
+                                @using (Html.BeginForm("DisableUser", "Admin", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@user.Id" />
+                                    <button type="submit" class="btn btn-outline-warning btn-sm"
+                                            onclick="return confirm('@("Are you sure you want to " + (user.isActive ? "Disable" : "Enable") + " this user?")')">@(user.isActive ? "Disable" : "Enable")
+                                    </button>
+                                }
+
                                 @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()

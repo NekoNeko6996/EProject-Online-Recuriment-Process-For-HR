@@ -83,10 +83,7 @@ else
                     @using (Html.BeginForm("UpdateProfile", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
                     {
                         @Html.AntiForgeryToken()
-                        if (!string.IsNullOrEmpty(id))
-                        {
-                            @Html.HiddenFor(model => model.ProfileUpdate.Id)
-                        }
+                        @Html.HiddenFor(model => model.ProfileUpdate.Id)
 
                         <!-- Personal Info -->
                         <h5>Personal Information</h5>
@@ -144,6 +141,7 @@ else
                     @using (Html.BeginForm("ChangePassword", "Account", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
                     {
                         @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.ChangePassword.Id)
 
                         <div class="mb-3">
                             @Html.LabelFor(model => model.ChangePassword.OldPassword, "Old Password", new { @class = "form-label" })
@@ -205,6 +203,7 @@ else
     //avatar upload form
     <form id="uploadForm" action="@Url.Action("UploadAvatar", "Account")" method="post" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
+        <input type="text" name="Id" value="@Model.ProfileUpdate.Id" hidden>  
         <input type="file" name="avatar" id="uploadFileInput" class="d-none">
     </form>
 
@@ -222,6 +221,7 @@ else
         const confirmUploadBtn = document.getElementById("confirmUploadBtn");
         const uploadForm = document.getElementById("uploadForm");
         const uploadFileInput = document.getElementById("uploadFileInput");
+
 
         fileInput.addEventListener("change", function (event) {
             const file = event.target.files[0];
