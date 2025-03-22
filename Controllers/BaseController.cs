@@ -17,7 +17,7 @@ public class BaseController : Controller
                 ViewBag.Page = "Index";
                 break;
             case "hrgroup":
-                ViewBag.Controller = "HrGroup";
+                ViewBag.Controller = "HRGroup";
                 ViewBag.Page = "Index";
                 break;
             case "interviewer":

@@ -9,16 +9,16 @@ using Microsoft.AspNet.Identity.Owin;
 using System.Threading.Tasks;
 using Sem3EProjectOnlineCPFH.Libraries;
 using Sem3EProjectOnlineCPFH.Models.User;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
     [Authorize(Roles = "admin")]
     public class AdminController : BaseController
     {
+        public AdminController() { }
         private readonly ApplicationUserManager _userManager;
         private ApplicationRoleManager _roleManager;
-
-        public AdminController() { }
         public AdminController(ApplicationUserManager userManager)
         {
             _userManager = userManager;
@@ -40,25 +40,46 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
         public ApplicationUserManager UserManager => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
-        public ActionResult Index()
+        public ActionResult Index(int page = 1)
         {
             ApplicationDbContext db = new ApplicationDbContext();
-            var users = db.Users.Select(u => new Sem3EProjectOnlineCPFH.Models.user.ManageUserAccountViewModel
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                PhoneNumber = u.PhoneNumber,
-                isActive = u.IsActive,
-                RoleName = db.Roles
-                    .Where(r => u.Roles.Select(ur => ur.RoleId).Contains(r.Id))
-                    .Select(r => r.Name)
-                    .FirstOrDefault(),
-                CreatedAt = u.CreatedAt
-            }).ToList();
+            int PageSize = 7;
 
+            string currentUserId = User.Identity.GetUserId();
+
+            int totalUsers = db.Users.Where(u => u.Id != currentUserId).Count();
+            int MaxPage = (int)Math.Ceiling((double)totalUsers / PageSize);
+
+            if (MaxPage < 1) MaxPage = 1;
+            if (page < 1) page = 1;
+            if (page > MaxPage) page = MaxPage;
+
+            var roleDict = db.Set<IdentityUserRole>()
+                .Join(db.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .ToDictionary(x => x.UserId, x => x.Name);
+
+            var users = db.Users
+                .Where(u => u.Id != currentUserId)
+                .OrderBy(u => u.CreatedAt)
+                .Skip(PageSize * (page - 1))
+                .Take(PageSize)
+                .ToList()
+                .Select(u => new Sem3EProjectOnlineCPFH.Models.user.ManageUserAccountViewModel
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    isActive = u.IsActive,
+                    RoleName = roleDict.ContainsKey(u.Id) ? roleDict[u.Id] : "No Role",
+                    CreatedAt = u.CreatedAt
+                }).ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.MaxPage = MaxPage;
             ViewBag.Users = users;
+
             return View(users);
         }
 
@@ -219,13 +240,13 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             {
                 user.IsActive = !user.IsActive;
                 db.SaveChanges();
-                TempData["SuccessMessage"] = $"Disabled User [{Id}] successfully!";
+                TempData["SuccessMessage"] = String.Concat(user.IsActive ? "Enable" : "Disable", $" User [{Id}] successfully!");
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Disable User Error: " + ex.Message);
-                TempData["ErrorMessage"] = "Disable User Error";
+                TempData["ErrorMessage"] = String.Concat(user.IsActive ? "Enable" : "Disable", "Disable User Error");
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
         }

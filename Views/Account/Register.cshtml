@@ -5,9 +5,9 @@
     Layout = "~/Views/Shared/_AccountLayoutPage.cshtml";
 }
 
-<div class="container d-flex align-items-center flex-column mt-5">
+<div class="container d-flex align-items-center justify-content-start flex-column mt-3">
     @*<img src="@Url.Content(ViewBag.WebIcon)" style="height: 70px; width: 70px; border-radius: 100%;" alt="Web Icon" onerror="console.log('Image not found:', this.src)" />*@
-    <h3 class="text-center mb-4 mt-2">Create First Account</h3>
+    <h3 class="text-center mb-4 mt-1">Create First Account</h3>
     <div class="alert alert-danger" style="text-align:center">!Important, this is the first time accessing the system, this account will be granted administrative rights. Please be very careful, after successfully creating an account, you will not be able to access this page again.</div>
     <div class="card p-4" style="max-width: 400px; width: 100%;">
 
@@ -41,7 +41,10 @@
 
                 <div class="mb-3">
                     @Html.LabelFor(model => model.Password, new { @class = "form-label" })
-                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Enter password", required = "required", autocomplete = "new-password" })
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", id = "password", placeholder = "Enter password", required = "required", autocomplete = "new-password" })
+                    <div class="progress mt-2">
+                        <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
                     @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                 </div>
 
@@ -58,3 +61,25 @@
         }
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('#password').on('input', function () {
+            var password = $(this).val();
+            var strength = 0;
+            if (password.length >= 6) strength += 1;
+            if (password.match(/[a-z]/)) strength += 1;
+            if (password.match(/[A-Z]/)) strength += 1;
+            if (password.match(/[0-9]/)) strength += 1;
+            if (password.match(/[@@$!%*?&]/)) strength += 1;
+
+            var strengthPercent = (strength / 5) * 100;
+            var progressBar = $('#password-strength');
+            progressBar.css('width', strengthPercent + '%');
+            progressBar.removeClass('bg-danger bg-warning bg-success');
+            if (strength <= 2) progressBar.addClass('bg-danger');
+            else if (strength <= 4) progressBar.addClass('bg-warning');
+            else progressBar.addClass('bg-success');
+        });
+    });
+</script>

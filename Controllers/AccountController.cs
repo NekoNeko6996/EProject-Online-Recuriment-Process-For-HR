@@ -166,14 +166,13 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 {
                     AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
                     TempData["ErrorMessage"] = "User not found!";
-                    return View();
+                    return RedirectToAction("Index", "Home");
                 }
 
                 string roleName = UserManager.GetRoles(User.Identity.GetUserId()).FirstOrDefault();
                 SetDefaultPage(roleName);
-                RedirectToAction(ViewBag.Page, ViewBag.Controller);
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
-
             return View();
         }
 

@@ -25,8 +25,6 @@ namespace Sem3EProjectOnlineCPFH.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // One-to-One Relationship
             modelBuilder.Entity<ApplicationUser>()
                 .HasOptional(u => u.UserProfile)
                 .WithRequired(p => p.ApplicationUser);

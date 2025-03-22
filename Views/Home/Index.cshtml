@@ -15,15 +15,38 @@
         <p class="lead mb-4">First, Click Login or Helper to start.</p>
     }
 
-    <div class="d-flex gap-3">
-        @if (ViewBag.AnyUserInDb)
-        {
-            <a href="/Account/Login" class="btn btn-primary">Login</a>
-        }
-        else
-        {
-            <a href="/Account/Register" class="btn btn-primary">Register</a>
-        }
-        <a href="/Home/Helper" class="btn btn-outline-secondary">Helper</a>
-    </div>
+<div class="d-flex gap-3">
+    @if (ViewBag.AnyUserInDb)
+    {
+        <a class="animated-button-outline" style="text-decoration: none;" href="/Account/Login">
+            <svg viewBox="0 0 24 24" class="arr-2">
+                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+            </svg>
+            <span class="text">Login</span>
+            <span class="circle"></span>
+            <svg viewBox="0 0 24 24" class="arr-1">
+                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+            </svg>
+        </a>
+    }
+    else
+    {
+        <a class="animated-button-outline" style="text-decoration: none;" href="@Url.Action("Register", "Account")">
+            <svg viewBox="0 0 24 24" class="arr-2">
+                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+            </svg>
+            <span class="text">Register</span>
+            <span class="circle"></span>
+            <svg viewBox="0 0 24 24" class="arr-1">
+                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+            </svg>
+        </a>
+    }
+    <a href="/Default/Help" class="animated-button-outline-1" style="text-decoration: none;">
+        Or click to see help
+        <div class="arrow-wrapper">
+            <div class="arrow"></div>
+        </div>
+    </a>
+</div>
 </div>

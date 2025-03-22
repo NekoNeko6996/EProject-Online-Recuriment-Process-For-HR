@@ -184,9 +184,13 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\Css\Button.css" />
+    <Content Include="Content\Css\Root.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\Resources\DefaultImg.png" />
+    <Content Include="Content\Resources\nav-logo-wellcome.png" />
+    <Content Include="Content\Resources\planet.png" />
     <Content Include="Content\Resources\WebLogo.png" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
@@ -208,6 +212,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\HRGroupController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -276,6 +281,7 @@
     <Content Include="Scripts\bootstrap.bundle.js.map" />
     <Content Include="Views\Default\Unauthorized.cshtml" />
     <Content Include="Views\Admin\UserInfo.cshtml" />
+    <Content Include="Views\HRGroup\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
