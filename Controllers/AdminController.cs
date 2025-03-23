@@ -8,8 +8,14 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System.Threading.Tasks;
 using Sem3EProjectOnlineCPFH.Libraries;
-using Sem3EProjectOnlineCPFH.Models.User;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Sem3EProjectOnlineCPFH.Services;
+using System.Collections.Generic;
+using Sem3EProjectOnlineCPFH.Models.Log;
+using System.Data.Entity;
+using System.Drawing.Printing;
+using System.Web.UI;
+using Sem3EProjectOnlineCPFH.Models.Data;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -100,7 +106,9 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(model);
             }
 
-            if(UserManager.FindByEmail(model.Email) != null)
+            SystemLog.WriteLog(User.Identity.Name, "Add User", "Admin", Request.UserHostAddress, "True", $"Add new user [{model.Email}]");
+
+            if (UserManager.FindByEmail(model.Email) != null)
             {
                 TempData["ErrorMessage"] = "Email already exists!";
                 return View(model);
@@ -121,6 +129,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             if (!result.Succeeded)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Add User", "Admin", Request.UserHostAddress, "False", $"Error during create new user [{model.Email}]");
                 foreach (var error in result.Errors)
                 {
                     System.Diagnostics.Debug.WriteLine("Create User Error: " + error);
@@ -147,16 +156,19 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 }
                 catch (Exception ex)
                 {
+                    SystemLog.WriteLog(User.Identity.Name, "Add Role", "Admin", Request.UserHostAddress, "False", $"Add role [{model.Role}] to user [{model.Email}]");
                     System.Diagnostics.Debug.WriteLine("Add Role Error: " + ex.Message);
                     TempData["ErrorMessage"] = "Role Not Found";
                     return View(model);
                 }
 
+                SystemLog.WriteLog(User.Identity.Name, "Add New Account", "Admin", Request.UserHostAddress, "True", $"Add New Account {model.Email} success");
                 TempData["SuccessMessage"] = "New Account created successfully!";
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
             catch (Exception ex)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Add User", "Admin", Request.UserHostAddress, "False", $"Error during create new user [{model.Email}]");
                 System.Diagnostics.Debug.WriteLine("DB Error: " + ex.Message);
                 TempData["ErrorMessage"] = "DB Error";
                 return View(model);
@@ -209,10 +221,12 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 db.Users.Remove(user);
                 db.SaveChanges();
                 TempData["SuccessMessage"] = $"Deleted User [{Id}] successfully!";
+                SystemLog.WriteLog(User.Identity.Name, "Delete User", "Admin", Request.UserHostAddress, "True", $"Delete User [{Id}] successfully!");
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Delete User", "Admin", Request.UserHostAddress, "False", $"Delete User Error: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine("Delete User Error: " + ex.Message);
                 TempData["ErrorMessage"] = "Delete User Error";
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
@@ -241,14 +255,110 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 user.IsActive = !user.IsActive;
                 db.SaveChanges();
                 TempData["SuccessMessage"] = String.Concat(user.IsActive ? "Enable" : "Disable", $" User [{Id}] successfully!");
+                SystemLog.WriteLog(User.Identity.Name, "Disable User", "Admin", Request.UserHostAddress, "True", String.Concat(user.IsActive ? "Enable" : "Disable", $" User [{Id}] successfully!"));
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
             catch (Exception ex)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Disable User", "Admin", Request.UserHostAddress, "False", String.Concat(user.IsActive ? "Enable" : "Disable", $" User Error: {ex.Message}"));
                 System.Diagnostics.Debug.WriteLine("Disable User Error: " + ex.Message);
                 TempData["ErrorMessage"] = String.Concat(user.IsActive ? "Enable" : "Disable", "Disable User Error");
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
+        }
+
+        // GET: Log Review
+        public ActionResult LogReview()
+        {
+            List<LogEntry> logData = SystemLog.ReadLog();
+
+            return View(logData.OrderByDescending(log => log.Timestamp).ToList());
+        }
+
+        // POST: Search USER
+        [HttpPost]
+        public ActionResult SearchUser(string role, string searchString, string status)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+
+            // Nhận giá trị từ form
+            role = Request.Form["role"];
+            status = Request.Form["status"];
+            searchString = Request.Form["searchString"];
+
+            // Include bảng Roles để tránh lỗi
+            var users = db.Users.Include(u => u.Roles).AsQueryable();
+
+            // Debug dữ liệu đầu vào
+            System.Diagnostics.Debug.WriteLine($"Received searchString: {searchString}");
+            System.Diagnostics.Debug.WriteLine($"Received role: {role}");
+            System.Diagnostics.Debug.WriteLine($"Received status: {status}");
+
+            // Tìm RoleId đúng từ bảng AspNetRoles
+            var roleEntity = db.Roles.FirstOrDefault(r => r.Name == role);
+            if (roleEntity != null)
+            {
+                users = users.Where(u => u.Roles.Any(r => r.RoleId == roleEntity.Id));
+            }
+
+            // Lọc theo status
+            if (!string.IsNullOrEmpty(status) && status != "all")
+            {
+                bool isActive = (status == "active");
+                users = users.Where(u => u.IsActive == isActive);
+            }
+
+            // Lọc theo searchString
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u => u.Email.Contains(searchString) ||
+                                         u.FirstName.Contains(searchString) ||
+                                         u.LastName.Contains(searchString) ||
+                                         u.Id.Contains(searchString));
+            }
+
+            // bỏ qua user hiện tại
+            string currentUserId = User.Identity.GetUserId();
+            users = users.Where(u => u.Id != currentUserId);
+
+            // Debug truy vấn
+            System.Diagnostics.Debug.WriteLine(users.ToString());
+
+            // Truy vấn Role của từng User trước khi đưa vào ViewModel
+            var userList = users.Select(u => new
+            {
+                u.Id,
+                u.FirstName,
+                u.LastName,
+                u.Email,
+                u.PhoneNumber,
+                u.IsActive,
+                RoleName = db.Roles
+                    .Where(r => r.Id == u.Roles.FirstOrDefault().RoleId)
+                    .Select(r => r.Name)
+                    .FirstOrDefault(),
+                u.CreatedAt
+            }).AsEnumerable()  // Chuyển sang LINQ to Objects
+            .Select(u => new Sem3EProjectOnlineCPFH.Models.user.ManageUserAccountViewModel
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                isActive = u.IsActive,
+                RoleName = u.RoleName ?? "No Role",
+                CreatedAt = u.CreatedAt
+            }).ToList();
+
+            ViewBag.Users = userList;
+            ViewBag.AdminPageSearchModelView = new AdminPageSearchModelView
+            {
+                SearchString = searchString,
+                Role = role,
+                Status = status
+            };
+            return View("Index", userList);
         }
     }
 }

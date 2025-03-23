@@ -1,0 +1,36 @@
+﻿@model List<Sem3EProjectOnlineCPFH.Models.Log.LogEntry>
+
+@{
+    ViewBag.Title = "LogReview";
+    Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
+}
+
+<h2 class="mt-5">Log</h2>
+<hr />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Controller</th>
+            <th>IP Address</th>
+            <th>Success</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr>
+                <td>@log.Timestamp</td>
+                <td>@log.User</td>
+                <td>@log.Action</td>
+                <td>@log.Controller</td>
+                <td>@log.IPAddress</td>
+                <td>@log.IsSuccess</td>
+                <td>@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>

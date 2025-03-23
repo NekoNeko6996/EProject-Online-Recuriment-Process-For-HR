@@ -58,6 +58,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             AuthenticationManager.SignIn(authProperties, identity);
+
         }
 
 
@@ -77,7 +78,6 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             {
                 ViewBag.Page = "Index";
                 ViewBag.Controller = "Home";
-
                 return RedirectToAction("Index", "Home");
             }
             return View();
@@ -89,6 +89,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            SystemLog.WriteLog("Guest", "Attempt Register", "Account", Request.UserHostAddress, "N/A");
             ApplicationDbContext db = new ApplicationDbContext();
             var isFirstUser = !db.Users.Any();
             
@@ -121,6 +122,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             var result = await UserManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Register Failed", "Account", Request.UserHostAddress, "False");
                 foreach (var error in result.Errors)
                 {
                     System.Diagnostics.Debug.WriteLine("Create User Error: " + error);
@@ -145,11 +147,13 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 System.Diagnostics.Debug.WriteLine("First user created, assigned as 'admin'");
                 SetDefaultPage("admin");
 
+                SystemLog.WriteLog(User.Identity.Name, "Register Successful", "Account", Request.UserHostAddress, "True");
                 TempData["SuccessMessage"] = "Account created successfully!";
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
             catch (Exception ex)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Register Failed", "Account", Request.UserHostAddress, "False", ex.Message);
                 System.Diagnostics.Debug.WriteLine("DB Error: " + ex.Message);
                 return View(model);
             }
@@ -188,11 +192,14 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             var user = await UserManager.FindByEmailAsync(model.Email);
             if (user != null)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Attempt Login", "Account", Request.UserHostAddress, "N/A");
+
                 if (!user.IsActive)
                 {
                     TempData["ErrorMessage"] = "Your account is inactive. Please contact support.";
                     return View(model);
                 }
+
                 if (await UserManager.CheckPasswordAsync(user, model.Password))
                 {
                     await SignInAsync(user, model.RememberMe);
@@ -201,6 +208,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     var roleName = roles.FirstOrDefault();
 
                     System.Diagnostics.Debug.WriteLine("User logged in: " + user.Email + " Role Name: " + roleName);
+                    SystemLog.WriteLog(User.Identity.Name, "Login Successful", "Account", Request.UserHostAddress, "True", roleName);
 
                     switch (roleName)
                     {
@@ -224,6 +232,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             }
 
             TempData["ErrorMessage"] = "Invalid Email or Password";
+            SystemLog.WriteLog(User.Identity.Name, "Login Failed", "Account", Request.UserHostAddress, "False", "Invalid Email or Password");
             return View(model);
         }
 
@@ -235,11 +244,13 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             try
             {
                 AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                SystemLog.WriteLog(User.Identity.Name, "Logout", "Account", Request.UserHostAddress, "True");
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Logout Error: " + ex.Message);
+                SystemLog.WriteLog(User.Identity.Name, "Logout Failed", "Account", Request.UserHostAddress, "False", ex.Message);
                 return RedirectToAction("Index", "Home");
             }
         }
@@ -258,6 +269,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             {
                 if (!User.IsInRole("admin"))
                 {
+                    SystemLog.WriteLog(User.Identity.Name, "Attempt View Profile", "Account", Request.UserHostAddress, "False", "Not authorized to view this page.");
                     TempData["ErrorMessage"] = "You are not authorized to view this page.";
                     return RedirectToAction(ViewBag.Page, ViewBag.Controller);
                 }
@@ -269,6 +281,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 {
                     return HttpNotFound();
                 }
+                
                 var profile = new ProfileViewModel
                 {
                     AvatarUrl = user.UserProfile.AvatarUrl,
@@ -307,6 +320,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             if (model.ProfileUpdate.Id != null && !User.IsInRole("admin"))
             {
+                SystemLog.WriteLog(User.Identity.Name, "Attempt Update Profile", "Account", Request.UserHostAddress, "False", "Not authorized to update this profile.");
                 TempData["ErrorMessage"] = "You are not authorized to update this profile.";
                 return RedirectToAction("ProfileSetting");
             }
@@ -345,6 +359,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                 db.SaveChanges();
                 System.Diagnostics.Debug.WriteLine("Profile updated successfully for: " + user.Email);
+                SystemLog.WriteLog(User.Identity.Name, "Update Profile", "Account", Request.UserHostAddress, "True", $"Profile ID: {id}");
             }
 
             TempData["SuccessMessage"] = "Profile updated successfully!";
@@ -377,7 +392,8 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                 if (result.Succeeded)
                 {
-                    if(userId == User.Identity.GetUserId())
+                    SystemLog.WriteLog(User.Identity.Name, "Change Password", "Account", Request.UserHostAddress, "True", $"Profile ID: {userId}");
+                    if (userId == User.Identity.GetUserId())
                     {
                         TempData["SuccessMessage"] = "Password changed successfully!";
                         return RedirectToAction("ProfileSetting");
@@ -389,7 +405,8 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     }
                 }
                 
-                if(userId == User.Identity.GetUserId())
+                SystemLog.WriteLog(User.Identity.Name, "Change Password", "Account", Request.UserHostAddress, "False", $"Profile ID: {userId}");
+                if (userId == User.Identity.GetUserId())
                 {
                     TempData["ErrorMessage"] = "Error Changing Password";
                     return RedirectToAction("ProfileSetting");
@@ -400,8 +417,9 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     return RedirectToAction(ViewBag.Page, ViewBag.Controller);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                SystemLog.WriteLog(User.Identity.Name, "Change Password", "Account", Request.UserHostAddress, "False", ex.Message);
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again.";
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
