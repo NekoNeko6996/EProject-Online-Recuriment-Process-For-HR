@@ -8,6 +8,8 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 public class BaseController : Controller
 {
+    public static readonly string AvatarSavePath = "/Content/Resources/Avatars/";
+
     public void SetDefaultPage(string roleName)
     {
         switch (roleName)

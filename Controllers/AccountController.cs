@@ -461,7 +461,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                 // Tạo tên file mới
                 string fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(form.Avatar.FileName);
-                string newAvatarPath = System.IO.Path.Combine(Server.MapPath("~/Content/Resources/Avatars"), fileName);
+                string newAvatarPath = System.IO.Path.Combine(Server.MapPath(AvatarSavePath), fileName);
 
                 try
                 {
@@ -476,7 +476,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                     // Lưu ảnh mới
                     form.Avatar.SaveAs(newAvatarPath);
-                    user.UserProfile.AvatarUrl = "/Content/Resources/Avatars/" + fileName; // Lưu đường dẫn tương đối
+                    user.UserProfile.AvatarUrl = AvatarSavePath + fileName; // Lưu đường dẫn tương đối
                     db.SaveChanges();
 
                     System.Diagnostics.Debug.WriteLine($"Avatar updated successfully for: {user.Email}");

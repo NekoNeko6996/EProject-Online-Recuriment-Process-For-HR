@@ -1,36 +1,96 @@
-﻿@model List<Sem3EProjectOnlineCPFH.Models.Log.LogEntry>
-
-@{
-    ViewBag.Title = "LogReview";
+﻿@{
+    ViewBag.Title = "Manage User Account";
     Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
+
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+    string minDateTime = ViewBag.MinDateTime;
+    string maxDateTime = ViewBag.MaxDateTime;
+    string startDateTime = string.IsNullOrEmpty(ViewBag.StartDateTime) ? minDateTime : ViewBag.StartDateTime;
+    string endDateTime = string.IsNullOrEmpty(ViewBag.EndDateTime) ? maxDateTime : ViewBag.EndDateTime;
 }
 
-<h2 class="mt-5">Log</h2>
-<hr />
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Timestamp</th>
-            <th>User</th>
-            <th>Action</th>
-            <th>Controller</th>
-            <th>IP Address</th>
-            <th>Success</th>
-            <th>Message</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var log in Model)
-        {
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mt-3">Log</h2>
+        <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#filterMenu">
+            <i class="fa-solid fa-filter"></i> Filter
+        </button>
+    </div>
+    <hr />
+
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@log.Timestamp</td>
-                <td>@log.User</td>
-                <td>@log.Action</td>
-                <td>@log.Controller</td>
-                <td>@log.IPAddress</td>
-                <td>@log.IsSuccess</td>
-                <td>@log.Message</td>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Controller</th>
+                <th>IP Address</th>
+                <th>Success</th>
+                <th>Message</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.Timestamp</td>
+                    <td>@log.User</td>
+                    <td>@log.Action</td>
+                    <td>@log.Controller</td>
+                    <td>@log.IPAddress</td>
+                    <td>@log.IsSuccess</td>
+                    <td>@log.Message</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    @if (totalPages > 1)
+    {
+        <hr />
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("LogReview", new { page = currentPage - 1, startDateTime = startDateTime, endDateTime = endDateTime })">Prev</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("LogReview", new { page = i, startDateTime = startDateTime, endDateTime = endDateTime })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("LogReview", new { page = currentPage + 1, startDateTime = startDateTime, endDateTime = endDateTime })">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Offcanvas Menu (Bộ lọc) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="filterMenu">
+    <div class="offcanvas-header bg-primary text-white">
+        <h5 class="offcanvas-title">Filter Logs</h5>
+        <button type="button" class="btn-close text-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        @using (Html.BeginForm("LogReview", "Admin", FormMethod.Get))
+        {
+            <div class="mb-3">
+                <label for="startDateTime" class="form-label">Start Date & Time</label>
+                <input type="datetime-local" id="startDateTime" name="startDateTime" class="form-control" value="@startDateTime" />
+            </div>
+            <div class="mb-3">
+                <label for="endDateTime" class="form-label">End Date & Time</label>
+                <input type="datetime-local" id="endDateTime" name="endDateTime" class="form-control" value="@endDateTime" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+            <a href="@Url.Action("LogReview")" class="btn btn-secondary w-100 mt-2">Reset</a>
         }
-    </tbody>
-</table>
+    </div>
+</div>

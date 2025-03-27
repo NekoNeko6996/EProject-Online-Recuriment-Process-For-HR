@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewBag.Title = "Help";
+    Layout = "~/Views/Shared/_DefaultLayoutPage.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+            <h5>Documents</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="#usermanual">User manual</a></li>
+                <li class="nav-item"><a class="nav-link" href="#commonerrors">Common errors</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact information</a></li>
+            </ul>
+        </nav>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+            <section id="usermanual" class="mt-4 border rounded p-3">
+                <h2>User manual</h2>
+                <hr />  
+                <p>Đây là phần hướng dẫn sử dụng hệ thống.</p>
+            </section>
+            <section id="commonerrors" class="mt-4 border rounded p-3">
+                <h2>Common errors</h2>
+                <hr />
+                <p>Danh sách các lỗi thường gặp và cách khắc phục.</p>
+            </section>
+            <section id="contact" class="mt-4 border rounded p-3">
+                <h2>Contact & Bug Report</h2>
+                <hr />
+                <p>Liên hệ với chúng tôi qua email hoặc số điện thoại.</p>
+            </section>
+        </main>
+    </div>
+</div>

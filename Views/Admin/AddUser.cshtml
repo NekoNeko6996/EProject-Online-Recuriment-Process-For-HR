@@ -5,91 +5,92 @@
     Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
 }
 
-<div class="row justify-content-center mt-3 mb-3">
-    <div class="col-md-8">
-        <div class="card p-4">
-            <h2 class="text-center mb-4">User Registration</h2>
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            @using (Html.BeginForm("AddUser", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken();
+<div class="container">
+    <div class="row justify-content-center mt-3 mb-3">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h2 class="text-center mb-4">User Registration</h2>
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @using (Html.BeginForm("AddUser", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken();
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.Email, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
-                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", type = "tel" })
-                        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.FirstName, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.LastName, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.Password, new { @class = "form-label" })
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "password" })
-                        <div class="progress mt-2">
-                            <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                         </div>
-                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", type = "tel" })
+                            @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
-                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @Html.LabelFor(m => m.Role, new { @class = "form-label" })
-                        @Html.DropDownListFor(m => m.Role, new List<SelectListItem>
-                        {
-                            new SelectListItem { Text = "Admin", Value = "admin" },
-                            new SelectListItem { Text = "HR Group", Value = "hrgroup" },
-                            new SelectListItem { Text = "Interviewer", Value = "interviewer" }
-                        }, "Select Role", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger" })
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.FirstName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.LastName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Upload Avatar</label>
-                        <input type="file" name="avatar" class="form-control" accept="image/*">
-                    </div>
-                </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </div>
-            }
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "password" })
+                            <div class="progress mt-2">
+                                <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m => m.Role, new { @class = "form-label" })
+                            @Html.DropDownListFor(m => m.Role, new List<SelectListItem>
+                            {
+                                new SelectListItem { Text = "HR Group", Value = "hrgroup" },
+                                new SelectListItem { Text = "Interviewer", Value = "interviewer" }
+                            }, "Select Role", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Upload Avatar</label>
+                            <input type="file" name="avatar" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>

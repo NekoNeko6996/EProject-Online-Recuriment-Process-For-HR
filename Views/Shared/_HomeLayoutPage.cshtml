@@ -37,7 +37,7 @@
         <div class="container-fluid">
             <h3 class="m-0">
                 <a class="navbar-brand" href="@Url.Action((string)ViewBag.Page ?? "Index", (string)ViewBag.Controller ?? "Home")" style="font-size: 25px; height: 40px;">
-                    <img src="@Url.Content("~/Content/Resources/nav-logo-wellcome.png")" alt="Alternate Text" class="m-0" style="height: 40px" />
+                    <img src="@Url.Content("~/Content/Resources/nav-logo-web-workspace-blue.png")" alt="Alternate Text" class="m-0" style="height: 40px" />
                 </a>
             </h3>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,62 +48,74 @@
                 <ul class="navbar-nav ms-auto">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>
-                            <div class="dropdown" id="top-nav-dropdown">
-                                <a href="#" role="button" id="dropdownMenuLink"
-                                   class="d-flex align-items-center text-decoration-none dropdown-toggle rounded"
-                                   data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #BBB; padding: 2px 5px 2px 5px">
-                                    <span class="bg-primary p-1 rounded me-1 text-white" style="font-size: 12px">
-                                        <strong>@ViewBag.CurrentUserRole.ToUpper()</strong>
-                                    </span>
-                                    <span class="fw-bold">
-                                        @if (ViewBag.CurrentUser != null && !string.IsNullOrWhiteSpace(ViewBag.CurrentUser.FirstName))
-                                        {
-                                            @String.Concat(ViewBag.CurrentUser.FirstName, " ", ViewBag.CurrentUser.LastName)
-                                        }
-                                        else
-                                        {
-                                            @("Default User Name")
-                                        }
-                                    </span>
-                                    <img src="@Url.Content($"{ViewBag.CurrentUser.UserProfile.AvatarUrl}")" alt="User Avatar" class="rounded-circle ms-2" width="31" height="31">
-                                </a>
+                        if (ViewBag.CurrentUserRole == "admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Admin")">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("AddUser", "Admin")">Add User</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("LogReview", "Admin")">System Log</a>
+                            </li>
+                         }
+                            <li>
+                                <div class="dropdown" id="top-nav-dropdown">
+                                    <a href="#" role="button" id="dropdownMenuLink"
+                                       class="d-flex align-items-center text-decoration-none dropdown-toggle rounded"
+                                       data-bs-toggle="dropdown" aria-expanded="false" style="border: 1px solid #BBB; padding: 2px 5px 2px 5px">
+                                        <span class="bg-primary p-1 rounded me-1 text-white" style="font-size: 12px">
+                                            <strong>@ViewBag.CurrentUserRole.ToUpper()</strong>
+                                        </span>
+                                        <span class="fw-bold">
+                                            @if (ViewBag.CurrentUser != null && !string.IsNullOrWhiteSpace(ViewBag.CurrentUser.FirstName))
+                                            {
+                                                @String.Concat(ViewBag.CurrentUser.FirstName, " ", ViewBag.CurrentUser.LastName)
+                                            }
+                                            else
+                                            {
+                                                @("Default User Name")
+                                            }
+                                        </span>
+                                        <img src="@Url.Content($"{ViewBag.CurrentUser.UserProfile.AvatarUrl}")" alt="User Avatar" class="rounded-circle ms-2" width="31" height="31">
+                                    </a>
 
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                                    <li class="d-flex flex-row align-items-center">
-                                        <a class="dropdown-item" href="@Url.Action("ProfileSetting", "Account")">
-                                            <i class="fa-solid fa-gear"></i>
-                                            <span class="m-1"></span>Setting
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
-                                        {
-                                            @Html.AntiForgeryToken();
-                                            <button type="submit" class="dropdown-item text-danger">
-                                                <i class="fa-solid fa-right-from-bracket"></i>
-                                                <span class="m-1"></span>Logout
-                                            </button>
-                                        }
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                                        <li class="d-flex flex-row align-items-center">
+                                            <a class="dropdown-item" href="@Url.Action("ProfileSetting", "Account")">
+                                                <i class="fa-solid fa-gear"></i>
+                                                <span class="m-1"></span>Setting
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "d-inline" }))
+                                            {
+                                                @Html.AntiForgeryToken();
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                                    <span class="m-1"></span>Logout
+                                                </button>
+                                            }
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
                     }
                     else
                     {
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Login", "Account")">Login</a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Login", "Account")">Login</a>
+                    </li>
                     }
                 </ul>
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container-fluid">
         @RenderBody()
     </div>
 

@@ -29,5 +29,7 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
 
         [Required]
         public string Role { get; set; }
+
+        public HttpPostedFileBase Avatar { get; set; }
     }
 }

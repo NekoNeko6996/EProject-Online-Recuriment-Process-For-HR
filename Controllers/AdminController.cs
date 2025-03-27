@@ -16,6 +16,7 @@ using System.Data.Entity;
 using System.Drawing.Printing;
 using System.Web.UI;
 using Sem3EProjectOnlineCPFH.Models.Data;
+using PagedList;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -53,7 +54,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             string currentUserId = User.Identity.GetUserId();
 
-            int totalUsers = db.Users.Where(u => u.Id != currentUserId).Count();
+            int totalUsers = db.Users.Count();
             int MaxPage = (int)Math.Ceiling((double)totalUsers / PageSize);
 
             if (MaxPage < 1) MaxPage = 1;
@@ -65,7 +66,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 .ToDictionary(x => x.UserId, x => x.Name);
 
             var users = db.Users
-                .Where(u => u.Id != currentUserId)
+                //.Where(u => u.Id != currentUserId)
                 .OrderBy(u => u.CreatedAt)
                 .Skip(PageSize * (page - 1))
                 .Take(PageSize)
@@ -82,6 +83,8 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     CreatedAt = u.CreatedAt
                 }).ToList();
 
+            ViewBag.TotalUserActive = db.Users.Where(u => u.IsActive == true).Count();
+            ViewBag.TotalUser = totalUsers;
             ViewBag.CurrentPage = page;
             ViewBag.MaxPage = MaxPage;
             ViewBag.Users = users;
@@ -140,13 +143,34 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             try
             {
-                // Tạo profile user
+                // create profile user
                 var userProfile = new UserProfile
                 {
                     Id = user.Id,
                     AvatarUrl = ViewBag.DefaultAvatar,
                 };
 
+                // upload avatar
+                if (model.Avatar != null)
+                {
+                    try
+                    {
+                        string filename = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(model.Avatar.FileName);
+                        string path = System.IO.Path.Combine(Server.MapPath(AvatarSavePath), filename);
+
+                        model.Avatar.SaveAs(path);
+                        userProfile.AvatarUrl = AvatarSavePath + filename;
+                    }
+                    catch (Exception ex)
+                    {
+                        SystemLog.WriteLog(User.Identity.Name, "Add User", "Admin", Request.UserHostAddress, "False", $"Error during upload avatar for user [{model.Email}]");
+                        System.Diagnostics.Debug.WriteLine("Upload Avatar Error: " + ex.Message);
+                        TempData["ErrorMessage"] = "Error during upload avatar";
+                        return View(model);
+                    }
+                }
+
+                // Save to DB
                 db.UserProfiles.Add(userProfile);
                 db.SaveChanges();
 
@@ -164,6 +188,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
                 SystemLog.WriteLog(User.Identity.Name, "Add New Account", "Admin", Request.UserHostAddress, "True", $"Add New Account {model.Email} success");
                 TempData["SuccessMessage"] = "New Account created successfully!";
+
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
             catch (Exception ex)
@@ -268,12 +293,65 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         }
 
         // GET: Log Review
-        public ActionResult LogReview()
+        public ActionResult LogReview(int page = 1, int pageSize = 10, string startDateTime = null, string endDateTime = null)
         {
-            List<LogEntry> logData = SystemLog.ReadLog();
+            var logs = SystemLog.ReadLog(); // Đọc dữ liệu từ JSON
 
-            return View(logData.OrderByDescending(log => log.Timestamp).ToList());
+            // Xác định thời gian nhỏ nhất và lớn nhất trong dữ liệu
+            DateTime minDateTime = logs.Min(l => DateTime.Parse(l.Timestamp));
+            DateTime maxDateTime = logs.Max(l => DateTime.Parse(l.Timestamp));
+
+            ViewBag.MinDateTime = minDateTime.ToString("yyyy-MM-ddTHH:mm");
+            ViewBag.MaxDateTime = maxDateTime.ToString("yyyy-MM-ddTHH:mm");
+
+            DateTime start = minDateTime;
+            DateTime end = maxDateTime;
+
+            if (!string.IsNullOrEmpty(startDateTime) && !string.IsNullOrEmpty(endDateTime))
+            {
+                string format = "yyyy-MM-ddTHH:mm";
+
+                bool isStartValid = DateTime.TryParseExact(startDateTime, format, null, System.Globalization.DateTimeStyles.None, out start);
+                bool isEndValid = DateTime.TryParseExact(endDateTime, format, null, System.Globalization.DateTimeStyles.None, out end);
+
+                if (!isStartValid || !isEndValid)
+                {
+                    ModelState.AddModelError("", "Invalid date format. Please select a valid date and time.");
+                    return View();
+                }
+            }
+
+            // 🔹 **Lọc dữ liệu dựa theo thời gian**
+            var filteredLogs = logs
+                .Where(l => DateTime.Parse(l.Timestamp) >= start && DateTime.Parse(l.Timestamp) <= end)
+                .ToList();
+
+            // Phân trang
+            int totalLogs = filteredLogs.Count;
+            int totalPages = (int)Math.Ceiling((double)totalLogs / pageSize);
+
+            var pagedLogs = filteredLogs
+                .OrderByDescending(l => DateTime.Parse(l.Timestamp))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.StartDateTime = startDateTime ?? minDateTime.ToString("yyyy-MM-ddTHH:mm");
+            ViewBag.EndDateTime = endDateTime ?? maxDateTime.ToString("yyyy-MM-ddTHH:mm");
+
+            return View(pagedLogs);
         }
+
+
+        // POST: Log Review
+        [HttpPost]
+        public ActionResult LogReview(string startDateTime, string endDateTime)
+        {
+            return RedirectToAction("LogReview", new { startDateTime, endDateTime });
+        }
+
 
         // POST: Search USER
         [HttpPost]
@@ -316,15 +394,8 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                                          u.LastName.Contains(searchString) ||
                                          u.Id.Contains(searchString));
             }
-
-            // bỏ qua user hiện tại
-            string currentUserId = User.Identity.GetUserId();
-            users = users.Where(u => u.Id != currentUserId);
-
-            // Debug truy vấn
             System.Diagnostics.Debug.WriteLine(users.ToString());
 
-            // Truy vấn Role của từng User trước khi đưa vào ViewModel
             var userList = users.Select(u => new
             {
                 u.Id,
@@ -338,7 +409,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                     .Select(r => r.Name)
                     .FirstOrDefault(),
                 u.CreatedAt
-            }).AsEnumerable()  // Chuyển sang LINQ to Objects
+            }).AsEnumerable()
             .Select(u => new Sem3EProjectOnlineCPFH.Models.user.ManageUserAccountViewModel
             {
                 Id = u.Id,
@@ -359,6 +430,35 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 Status = status
             };
             return View("Index", userList);
+        }
+
+        // POST: Change role
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangeRole(string Id, string Role)
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            var user = db.Users.Find(Id);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = $"User [{Id}] not found!";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+            try
+            {
+                UserManager.RemoveFromRoles(Id, UserManager.GetRoles(Id).ToArray());
+                UserManager.AddToRole(Id, Role);
+                TempData["SuccessMessage"] = $"Change Role [{Role}] for User [{Id}] successfully!";
+                SystemLog.WriteLog(User.Identity.Name, "Change Role", "Admin", Request.UserHostAddress, "True", $"Change Role [{Role}] for User [{Id}] successfully!");
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                SystemLog.WriteLog(User.Identity.Name, "Change Role", "Admin", Request.UserHostAddress, "False", $"Change Role Error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine("Change Role Error: " + ex.Message);
+                TempData["ErrorMessage"] = "Change Role Error";
+                return RedirectToAction("Index");
+            }
         }
     }
 }

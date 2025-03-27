@@ -15,12 +15,49 @@
         text-align: left;
     }
 
+
     .table-responsive {
         overflow-x: auto;
     }
 </style>
-<div class="container">
-    <h2 class="mt-3">User Management</h2>
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Làm mờ nền */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1050;
+    }
+
+    .spinner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .spinner-border {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    .loading-text {
+        margin-top: 10px;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+</style>
+
+<div class="container-fluid">
+    <div>
+        <h2 class="mt-3">User Management</h2>
+        <p>[@ViewBag.TotalUserActive / @ViewBag.TotalUser Active]</p>
+    </div>
     <hr />
 
     @if (TempData["ErrorMessage"] != null)
@@ -114,10 +151,11 @@
                 </div>
                 <div class="input-group">
                     @Html.TextBox("SearchString", SearchQuery != null && SearchQuery.SearchString != null ? SearchQuery.SearchString : "", new { @class = "form-control", placeholder = "Search", aria_label = "Search" })
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
+
                 </div>
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
             }
         </div>
 
@@ -138,36 +176,59 @@
                 <tbody id="userTable">
                     @foreach (var user in ViewBag.Users)
                     {
-                        if (user.Id == ViewBag.UserId)
-                        {
-                            continue;
-                        }
                         <tr>
                             <td>@user.Id</td>
                             <td style="text-align: left;">@user.FirstName @user.LastName</td>
                             <td style="text-align: left;">@user.Email</td>
                             <td>@(user.PhoneNumber ?? "N/A")</td>
-                            <td>@user.RoleName</td>
+                            <td>
+                                @if (user.Id != ViewBag.UserId)
+                                {
+                                    using (Html.BeginForm("ChangeRole", "Admin", FormMethod.Post, new { id = $"roleForm-{user.Id}" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@user.Id" />
+                                        <select id="roleSelect-@user.Id" name="Role" class="form-select">
+                                            <option value="admin" @(user.RoleName == "admin" ? "selected" : null)>Admin</option>
+                                            <option value="hrgroup" @(user.RoleName == "hrgroup" ? "selected" : null)>HR Group</option>
+                                            <option value="interviewer" @(user.RoleName == "interviewer" ? "selected" : null)>Interviewer</option>
+                                        </select>
+                                    }
+                                }
+                                else
+                                {
+                                    @(user.RoleName.ToUpper())
+                                }
+                            </td>
                             <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
                             <td>
                                 <strong class="@(user.isActive? "text-success" : "text-warning")">@(user.isActive ? "Active" : "Disable")</strong>
                             </td>
-                            <td class="d-flex gap-2 justify-content-center">
-                                <a href="@Url.Action("ProfileSetting", "Account")?id=@user.Id" class="btn btn-outline-primary btn-sm">Profile Setting</a>
-                                @using (Html.BeginForm("DisableUser", "Admin", FormMethod.Post, new { id = "disableForm" }))
+                            <td>
+                                @if (user.Id != ViewBag.UserId)
                                 {
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="Id" value="@user.Id" />
-                                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="confirmDisable('@(user.isActive? "Disable" : "Enable")', '@user.Id')">
-                                        @(user.isActive ? "Disable" : "Enable")
-                                    </button>
-                                }
+                                    <div class="d-flex gap-2 justify-content-start">
+                                        <a href="@Url.Action("ProfileSetting", "Account")?id=@user.Id" class="btn btn-outline-primary btn-sm">Profile Setting</a>
+                                        @using (Html.BeginForm("DisableUser", "Admin", FormMethod.Post, new { id = $"disableForm-{user.Id}" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="Id" value="@user.Id" />
+                                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="confirmDisable('@(user.isActive? "Disable" : "Enable")', '@user.Id')">
+                                                @(user.isActive ? "Disable" : "Enable")
+                                            </button>
+                                        }
 
-                                @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post, new { id = "deleteForm" }))
+                                        @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post, new { id = $"deleteForm-{user.Id}" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="Id" value="@user.Id" />
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@user.Id')">Delete</button>
+                                        }
+                                    </div>
+                                }
+                                else
                                 {
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="Id" value="@user.Id" />
-                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@user.Id')">Delete</button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm disabled">YOU</button>
                                 }
                             </td>
                         </tr>
@@ -179,7 +240,7 @@
         if (totalPages > 1)
         {
             <hr />
-            <nav>
+            <nav class="d-flex justify-content-center">
                 <ul class="pagination">
                     <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                         <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1 })">
@@ -239,11 +300,6 @@
                             Next
                         </a>
                     </li>
-
-                    <li class="page-item">
-                        <input type="number" id="jumpPage" class="form-control" style="width: 70px; display: inline-block;" min="1" max="@totalPages" />
-                        <button class="btn btn-outline-primary" onclick="jumpToPage()">Go</button>
-                    </li>
                 </ul>
             </nav>
         }
@@ -277,40 +333,6 @@
     </div>
 </div>
 
-<!-- CSS -->
-<style>
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5); /* Làm mờ nền */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1050;
-    }
-
-    .spinner-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .spinner-border {
-        width: 4rem;
-        height: 4rem;
-    }
-
-    .loading-text {
-        margin-top: 10px;
-        color: white;
-        font-size: 1.2rem;
-        font-weight: bold;
-    }
-</style>
-
 <!-- JS (Hiển thị Spinner) -->
 <script>
     function showLoading() {
@@ -331,42 +353,33 @@
     });
 </script>
 
-
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const tableRows = document.querySelectorAll('#userTable tr');
-
-    searchInput.addEventListener('keyup', function () {
-        const searchValue = searchInput.value.toLowerCase();
-        tableRows.forEach(row => {
-            const rowData = row.textContent.toLowerCase();
-            row.style.display = rowData.includes(searchValue) ? '' : 'none';
-        });
-    });
-</script>
-
 <script>
     function confirmDelete(id) {
         showAlert("Warning", ["Are you sure you want to delete this user?", "This action will not be reversed.", `UID: ${id}`], "Confirm", () => {
-            document.getElementById('deleteForm').submit();
+            document.getElementById(`deleteForm-${id}`).submit();
         });
     }
 </script>
 <script>
     function confirmDisable(action, id) {
         showAlert("Warning", [`Are you sure you want to ${action} this user?`, `UID: ${id}`], "Confirm", () => {
-            document.getElementById('disableForm').submit();
+            document.getElementById(`disableForm-${id}`).submit();
         });
     }
 </script>
 
 <script>
-    function jumpToPage() {
-        var page = document.getElementById("jumpPage").value;
-        if (page >= 1 && page <= @totalPages) {
-            window.location.href = '@Url.Action("Index")?page=' + page;
-        }
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("select[name='Role']").forEach(select => {
+            select.addEventListener("change", function () {
+                const userId = this.id.replace("roleSelect-", ""); // Lấy userId từ ID
+                const selected = this.value;
+                showAlert("Warning", [`Are you sure you want to change this user's role?`, `UID: ${userId}`, `To Role: [${selected}]`], "Confirm", () => {
+                    document.getElementById("roleForm-" + userId).submit();
+                });
+            });
+        });
+    });
 </script>
 
 
