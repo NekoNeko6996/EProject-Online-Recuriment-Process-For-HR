@@ -10,10 +10,11 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
     public class Applicant_Vacancy
     {
         [Key]
-        public int ApplicantVacancyId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string ApplicantVacancyId { get; set; }
 
-        public int ApplicantId { get; set; }
-        public int VacancyId { get; set; }
+        public string ApplicantId { get; set; }
+        public string VacancyId { get; set; }
         public int Approver { get; set; }
         public DateTime ApplyAt { get; set; }
 

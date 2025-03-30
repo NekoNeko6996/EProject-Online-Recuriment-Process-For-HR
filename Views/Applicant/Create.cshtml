@@ -1,0 +1,129 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Applicant
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create Applicant";
+}
+
+<div class="d-flex justify-content-center align-items-center vh-90">
+    <div class="col-md-6">
+        <h3 class="text-center mb-4">Create Applicant</h3>
+        @using (Html.BeginForm("Create", "Applicant", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Applicant ID</label>
+                <input type="text" class="form-control" value="@ViewBag.ApplicantId" readonly />
+                @Html.HiddenFor(model => model.ApplicantId)
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Name</label>
+                @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Enter full name", required = "required" })
+                @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Email</label>
+                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Enter email", required = "required" })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Phone Number</label>
+                @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control", type = "tel", placeholder = "Enter phone number", required = "required" })
+                @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Avatar Upload -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload Avatar</label>
+                <input type="file" class="form-control" name="AvatarFile" id="AvatarFile" accept="image/*" required />
+                <img id="avatarPreview" src="#" alt="Avatar Preview" style="max-width: 100px; display: none; border-radius: 50%;" class="mt-2" />
+                <button type="button" id="removeAvatar" class="btn btn-danger btn-sm mt-2" style="display: none;">Remove Avatar</button>
+            </div>
+
+            <!-- CV Upload -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload CV</label>
+                <input type="file" class="form-control" name="CVFile" id="CVFile" accept=".pdf,.doc,.docx" required />
+                <small class="text-muted">Accepted formats: PDF, DOC, DOCX</small>
+                <button type="button" id="removeCV" class="btn btn-danger btn-sm mt-2" style="display: none;">Remove CV</button>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Vacancy</label>
+                @Html.TextBox("VacancyInput", null, new { @class = "form-control", placeholder = "Enter Vacancy" })
+
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Status</label>
+                @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+                {
+                    new { Value = "Not in Process", Text = "Not in Process" },
+                    new { Value = "In Process", Text = "In Process" },
+                    new { Value = "Hired", Text = "Hired" },
+                    new { Value = "Banned", Text = "Banned" }
+                }, "Value", "Text"), "Select Status", new { @class = "form-control", required = "required" })
+                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Created Date</label>
+                @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date", id = "CreatedDate", required = "required" })
+                @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary px-4 me-2">Create</button>
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary px-4" })
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("CreatedDate").setAttribute("max", today);
+            document.getElementById("CreatedDate").value = today;
+
+            var avatarInput = document.getElementById("AvatarFile");
+            var avatarPreview = document.getElementById("avatarPreview");
+            var removeAvatar = document.getElementById("removeAvatar");
+
+            avatarInput.addEventListener("change", function (event) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    avatarPreview.src = reader.result;
+                    avatarPreview.style.display = "block";
+                    removeAvatar.style.display = "inline-block";
+                };
+                reader.readAsDataURL(event.target.files[0]);
+            });
+
+            removeAvatar.addEventListener("click", function () {
+                avatarInput.value = "";
+                avatarPreview.src = "#";
+                avatarPreview.style.display = "none";
+                removeAvatar.style.display = "none";
+            });
+
+            var cvInput = document.getElementById("CVFile");
+            var removeCV = document.getElementById("removeCV");
+
+            cvInput.addEventListener("change", function () {
+                removeCV.style.display = "inline-block";
+            });
+
+            removeCV.addEventListener("click", function () {
+                cvInput.value = "";
+                removeCV.style.display = "none";
+            });
+        });
+    </script>
+}

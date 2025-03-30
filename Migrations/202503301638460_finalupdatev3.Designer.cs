@@ -6,14 +6,14 @@ namespace Sem3EProjectOnlineCPFH.Migrations
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class InitialMigration : IMigrationMetadata
+    [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
+    public sealed partial class finalupdatev3 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialMigration));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(finalupdatev3));
         
         string IMigrationMetadata.Id
         {
-            get { return "202503200314259_InitialMigration"; }
+            get { return "202503301638460_finalupdatev3"; }
         }
         
         string IMigrationMetadata.Source

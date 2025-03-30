@@ -1,0 +1,111 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Applicant
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Edit Applicant";
+}
+
+<h2>Edit Applicant</h2>
+
+@using (Html.BeginForm("Edit", "Applicant", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Applicant Details</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ApplicantId)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.FullName, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Enter full name" })
+            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Enter email" })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.PhoneNumber, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control", type = "tel", placeholder = "Enter phone number" })
+            @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Status, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+            {
+                new { Value = "Not in Process", Text = "Not in Process" },
+                new { Value = "In Process", Text = "In Process" },
+                new { Value = "Hired", Text = "Hired" },
+                new { Value = "Banned", Text = "Banned" }
+            }, "Value", "Text"), "Select Status", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CreatedAt, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date", Value = Model.CreatedAt.ToString("yyyy-MM-dd") })
+            @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <!-- Avatar Upload -->
+    <div class="form-group">
+        <label class="control-label col-md-2">Avatar</label>
+        <div class="col-md-10">
+            @Html.HiddenFor(model => model.AvatarPath) <!-- Giữ giá trị cũ -->
+            @if (!string.IsNullOrEmpty(Model.AvatarPath))
+            {
+                <img src="@Url.Content(Model.AvatarPath)" alt="Avatar" style="max-width: 100px; border-radius: 50%;" class="mb-2" />
+                <br />
+                <input type="checkbox" id="DeleteAvatar" name="DeleteAvatar" value="true" />
+                <label for="DeleteAvatar">Delete Avatar</label>
+            }
+            <input type="file" class="form-control" name="AvatarFile" accept="image/*" />
+        </div>
+    </div>
+
+    <!-- CV Upload -->
+    <div class="form-group">
+        <label class="control-label col-md-2">CV</label>
+        <div class="col-md-10">
+            @Html.HiddenFor(model => model.CVPath) <!-- Giữ giá trị cũ -->
+            @if (!string.IsNullOrEmpty(Model.CVPath))
+            {
+                <a href="@Url.Content(Model.CVPath)" target="_blank">View CV</a>
+                <br />
+                <input type="checkbox" name="DeleteCV" value="true" />
+                <label for="DeleteCV">Delete CV</label>
+            }
+            <input type="file" class="form-control" name="CVFile" accept=".pdf,.doc,.docx" />
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-primary">Save</button>
+            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+</div>
+}
+
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}

@@ -192,6 +192,8 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Css\Button.css" />
     <Content Include="Content\Css\Root.css" />
+    <Content Include="Content\Css\_Layout\PagedList.css" />
+    <Content Include="Content\Css\_Layout\Site.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\PagedList.css" />
@@ -219,22 +221,31 @@
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\ApplicantController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
+    <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\HRGroupController.cs" />
+    <Compile Include="Controllers\InterviewScheduleController.cs" />
+    <Compile Include="Controllers\VacancyController.cs" />
+    <Compile Include="Controllers\VacancyScheduleController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Libraries\ApplicationUserManager.cs" />
     <Compile Include="Middleware\ActiveUserMiddleware.cs" />
-    <Compile Include="Migrations\202503200314259_InitialMigration.cs" />
-    <Compile Include="Migrations\202503200314259_InitialMigration.Designer.cs">
-      <DependentUpon>202503200314259_InitialMigration.cs</DependentUpon>
+    <Compile Include="Migrations\202503270351310_finalupdatev1.cs" />
+    <Compile Include="Migrations\202503270351310_finalupdatev1.Designer.cs">
+      <DependentUpon>202503270351310_finalupdatev1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202503260151333_final.cs" />
-    <Compile Include="Migrations\202503260151333_final.Designer.cs">
-      <DependentUpon>202503260151333_final.cs</DependentUpon>
+    <Compile Include="Migrations\202503271527131_finalupdatev2.cs" />
+    <Compile Include="Migrations\202503271527131_finalupdatev2.Designer.cs">
+      <DependentUpon>202503271527131_finalupdatev2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503301638460_finalupdatev3.cs" />
+    <Compile Include="Migrations\202503301638460_finalupdatev3.Designer.cs">
+      <DependentUpon>202503301638460_finalupdatev3.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -254,6 +265,10 @@
     <Compile Include="Models\Data\Interview.cs" />
     <Compile Include="Models\Data\Vacancy.cs" />
     <Compile Include="Models\Log\LogEntry.cs" />
+    <Compile Include="Models\ViewModels\ApplicantViewModel.cs" />
+    <Compile Include="Models\ViewModels\Interviewer.cs" />
+    <Compile Include="Models\ViewModels\InterviewViewModel.cs" />
+    <Compile Include="Models\ViewModels\VacancyViewModel.cs" />
     <Compile Include="Models\User\ManageUserAccountViewModel.cs" />
     <Compile Include="Models\User\UploadAvatarViewModel.cs" />
     <Compile Include="Models\User\UserId.cs" />
@@ -309,6 +324,31 @@
     <Content Include="Views\Default\DatabaseConnectError.cshtml" />
     <Content Include="Views\Shared\_DefaultLayoutPage.cshtml" />
     <Content Include="Views\Default\Help.cshtml" />
+    <Content Include="Views\Applicant\Create.cshtml" />
+    <Content Include="Views\Applicant\Delete.cshtml" />
+    <Content Include="Views\Applicant\Details.cshtml" />
+    <Content Include="Views\Applicant\Edit.cshtml" />
+    <Content Include="Views\Applicant\Index.cshtml" />
+    <Content Include="Views\Department\Create.cshtml" />
+    <Content Include="Views\Department\Delete.cshtml" />
+    <Content Include="Views\Department\Edit.cshtml" />
+    <Content Include="Views\Department\Index.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Vacancy\Create.cshtml" />
+    <Content Include="Views\Vacancy\Delete.cshtml" />
+    <Content Include="Views\Vacancy\Details.cshtml" />
+    <Content Include="Views\Vacancy\Edit.cshtml" />
+    <Content Include="Views\Vacancy\Index.cshtml" />
+    <Content Include="Views\InterviewSchedule\Create.cshtml" />
+    <Content Include="Views\InterviewSchedule\Delete.cshtml" />
+    <Content Include="Views\InterviewSchedule\Details.cshtml" />
+    <Content Include="Views\InterviewSchedule\Edit.cshtml" />
+    <Content Include="Views\InterviewSchedule\Index.cshtml" />
+    <Content Include="Views\Shared\_CreateInterview.cshtml" />
+    <Content Include="Views\Shared\_ScheduleLayout.cshtml" />
+    <Content Include="Views\VacancySchedule\Applicants.cshtml" />
+    <Content Include="Views\VacancySchedule\Details.cshtml" />
+    <Content Include="Views\VacancySchedule\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -317,16 +357,21 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Content\Resources\Applicant\Upload\Avatars\" />
+    <Folder Include="Content\Resources\Applicant\Upload\CVs\" />
     <Folder Include="Content\Resources\Avatars\" />
     <Folder Include="Content\Resources\Icons\" />
     <Folder Include="Views\Base\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202503200314259_InitialMigration.resx">
-      <DependentUpon>202503200314259_InitialMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202503270351310_finalupdatev1.resx">
+      <DependentUpon>202503270351310_finalupdatev1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202503260151333_final.resx">
-      <DependentUpon>202503260151333_final.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202503271527131_finalupdatev2.resx">
+      <DependentUpon>202503271527131_finalupdatev2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503301638460_finalupdatev3.resx">
+      <DependentUpon>202503301638460_finalupdatev3.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

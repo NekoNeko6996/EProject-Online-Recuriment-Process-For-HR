@@ -1,0 +1,177 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Interview
+
+@{
+    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    ViewBag.Title = "Create New Interview";
+
+    string AID = Request.QueryString["AID"];
+    string VID = Request.QueryString["VID"];
+}
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary">Create New Interview</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @using (Html.BeginForm("Create", "InterviewSchedule", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <!-- Column 1: Interview Details -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Interview Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.ApplicantId, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.ApplicantId, new { @class = "form-control", id = "ApplicantId", @Value = AID, @readonly = "readonly" })
+                            @Html.ValidationMessageFor(m => m.ApplicantId, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.VacancyId, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.VacancyId, new { @class = "form-control", id = "VacancyId", @Value = VID, @readonly = "readonly" })
+                            @Html.ValidationMessageFor(m => m.VacancyId, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.InterviewerId, new { @class = "form-label fw-bold" })
+                            <input type="text" id="InterviewerName" class="form-control" readonly placeholder="Select Interviewer">
+                            @Html.HiddenFor(m => m.InterviewerId, new { id = "InterviewerId" })
+                            <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#interviewerModal">
+                                Choose Interviewer
+                            </button>
+
+                            @Html.ValidationMessageFor(m => m.InterviewerId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: Scheduling Details -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Scheduling Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.ScheduledDate, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.ScheduledDate, new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.ScheduledDate, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.StartTime, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.StartTime, new { @class = "form-control", type = "time" })
+                            @Html.ValidationMessageFor(m => m.StartTime, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.EndTime, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.EndTime, new { @class = "form-control", type = "time" })
+                            @Html.ValidationMessageFor(m => m.EndTime, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.InterviewMethod, new { @class = "form-label fw-bold" })
+                            @Html.DropDownListFor(m => m.InterviewMethod, new SelectList(new[]
+             {
+                                new { Value = "Online", Text = "Online" },
+                                new { Value = "Offline", Text = "Offline" }
+                            }, "Value", "Text"), "Select Method", new { @class = "form-select", id = "interviewMethodDropdown" })
+                            @Html.ValidationMessageFor(m => m.InterviewMethod, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div id="interviewUrlContainer" class="mb-3 d-none">
+                            @Html.LabelFor(m => m.InterviewURL, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.InterviewURL, new { @class = "form-control", placeholder = "Enter meeting link..." })
+                            @Html.ValidationMessageFor(m => m.InterviewURL, "", new { @class = "text-danger" })
+                        </div>
+
+                    </div>
+                </div>
+            </div> <!-- Kết thúc row -->
+            <!-- Submit button -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-4">Save Interview</button>
+            </div>
+            }
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="interviewerModal" tabindex="-1" aria-labelledby="interviewerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="interviewerModalLabel">Select Interviewer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interviewerTableBody">
+                                @if (ViewBag.Interviewers != null)
+                                {
+                                    foreach (var interviewer in ViewBag.Interviewers)
+                                    {
+                                        <tr>
+                                            <td>@interviewer.InterviewerId</td>
+                                            <td>@(interviewer.LastName + " " + interviewer.FirstName)</td>
+                                            <td>@interviewer.Email</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary btn-sm select-interviewer"
+                                                        data-id="@interviewer.InterviewerId" data-name="@(interviewer.FirstName + " " + interviewer.FirstName)">
+                                                    Select
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".select-interviewer").click(function () {
+                let interviewerId = $(this).data("id");
+                let interviewerName = $(this).data("name");
+
+                $("#InterviewerId").val(interviewerId);
+                $("#InterviewerName").val(interviewerName);
+
+                $("#interviewerModal").modal("hide");
+            });
+
+            $("#interviewMethodDropdown").change(function () {
+                let selectedMethod = $(this).val();
+                if (selectedMethod === "Online") {
+                    $("#interviewUrlContainer").removeClass("d-none");
+                } else {
+                    $("#interviewUrlContainer").addClass("d-none");
+                }
+            });
+        });
+    </script>
+}
+

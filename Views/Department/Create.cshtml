@@ -1,0 +1,27 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Department
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create Department";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Create Department</h2>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label>Department Name</label>
+            @Html.TextBoxFor(model => model.DepartmentName, new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.DepartmentName, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit" class="btn btn-success mt-2">Create</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary mt-2">Back to List</a>
+
+        @Html.ValidationMessageFor(model => model.DepartmentName, "", new { @class = "text-danger" })
+
+    }
+</div>

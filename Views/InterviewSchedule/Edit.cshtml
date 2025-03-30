@@ -1,0 +1,73 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Interview
+
+@{
+    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    ViewBag.Title = "Edit Interview";
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary text-center">Edit Interview</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @using (Html.BeginForm("Edit", "Interview", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.InterviewId)
+
+        <div class="form-group">
+            <label>Applicant</label>
+            @Html.EditorFor(model => model.ApplicantId, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+        <div class="form-group">
+            <label>Position</label>
+            @Html.EditorFor(model => model.VacancyId, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+        <div class="form-group">
+            <label>Interviewer</label>
+            @Html.EditorFor(model => model.InterviewerId, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+        <div class="form-group">
+            <label>Scheduled Date</label>
+            @Html.EditorFor(model => model.ScheduledDate, new { htmlAttributes = new { @class = "form-control", type = "date" } })
+        </div>
+
+        <div class="form-group">
+            <label>Start Time</label>
+            @Html.EditorFor(model => model.StartTime, new { htmlAttributes = new { @class = "form-control", type = "time" } })
+        </div>
+
+        <div class="form-group">
+            <label>End Time</label>
+            @Html.EditorFor(model => model.EndTime, new { htmlAttributes = new { @class = "form-control", type = "time" } })
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+            {
+                new { Value = "Scheduled", Text = "Scheduled" },
+                new { Value = "Completed", Text = "Completed" },
+                new { Value = "Cancelled", Text = "Cancelled" }
+            }, "Value", "Text"), "Select Status", new { @class = "form-control" })
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Save</button>
+        <a href="@Url.Action("Index", "Interview")" class="btn btn-secondary mt-3">Cancel</a>
+    }
+</div>

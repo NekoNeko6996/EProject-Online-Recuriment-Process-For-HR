@@ -1,0 +1,75 @@
+﻿@model PagedList.IPagedList<Sem3EProjectOnlineCPFH.Models.Data.Department>
+@using PagedList.Mvc
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Department List";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Department List</h2>
+
+    <!-- Thanh công cụ chứa nút Create và ô tìm kiếm -->
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Nút Create nằm bên trái -->
+        <a href="@Url.Action("Create")" class="btn btn-primary">Create New</a>
+
+        <!-- Form tìm kiếm nằm bên phải -->
+        <form class="d-flex" method="get" action="@Url.Action("Index")">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search Department..." value="@ViewBag.Search" />
+            <button type="submit" class="btn btn-outline-secondary">Search</button>
+        </form>
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.DepartmentId</h5>
+                        <hr />
+                        <p class="card-text">@item.DepartmentName</p>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Edit", new { id = item.DepartmentId })" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = item.DepartmentId })" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Phân trang -->
+    <div class="d-flex flex-column align-items-center mt-3">
+        <div>
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+        </div>
+        <div class="mt-2">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, search = ViewBag.Search }),
+            new PagedListRenderOptions
+            {
+                Display = PagedListDisplayMode.IfNeeded,
+                MaximumPageNumbersToDisplay = 5,
+                ContainerDivClasses = new[] { "pagination-container", "d-flex", "justify-content-center" },
+                UlElementClasses = new[] { "pagination", "gap-2" }
+            })
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".card").forEach(card => {
+                card.addEventListener("mouseenter", () => card.classList.add("shadow-lg"));
+                card.addEventListener("mouseleave", () => card.classList.remove("shadow-lg"));
+            });
+        });
+    </script>
+}

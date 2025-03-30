@@ -26,7 +26,7 @@ namespace Sem3EProjectOnlineCPFH.Models
         public DbSet<Department> Departments { get; set; }
         public DbSet<Vacancy> Vacancies { get; set; }
         public DbSet<Applicant> Applicants { get; set; }
-        public DbSet<Applicant_Vacancy> ApplicantVacancies { get; set; }
+        public DbSet<Applicant_Vacancy> Applicant_Vacancies { get; set; }
         public DbSet<Interview> Interviews { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -63,6 +63,13 @@ namespace Sem3EProjectOnlineCPFH.Models
                 .HasRequired(i => i.Vacancy)
                 .WithMany()
                 .HasForeignKey(i => i.VacancyId)
+                .WillCascadeOnDelete(false);
+
+            // User - Interviewer (1-n)
+            modelBuilder.Entity<Interview>()
+                .HasRequired(i => i.Interviewer)
+                .WithMany(u => u.Interviews)
+                .HasForeignKey(i => i.InterviewerId)
                 .WillCascadeOnDelete(false);
 
             base.OnModelCreating(modelBuilder);

@@ -1,0 +1,63 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Vacancy
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Vacancy Details";
+}
+
+<div class="container mt-4 p-4 rounded" style="background-color: #f8f9fa;">
+    <h3 class="text-primary mb-3"><i class="fas fa-briefcase me-2"></i>Vacancy Details</h3>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-2">
+                <strong>Vacancy ID:</strong>
+                <div class="form-control bg-light">@Html.DisplayFor(model => model.VacancyId)</div>
+            </div>
+            <div class="mb-2">
+                <strong>Title:</strong>
+                <div class="form-control bg-light">@Html.DisplayFor(model => model.Title)</div>
+            </div>
+            <div class="mb-2">
+                <strong>Department ID:</strong>
+                <div class="form-control bg-light">@Html.DisplayFor(model => model.Department.DepartmentId)</div>
+            </div>
+            <div class="mb-2">
+                <strong>Department Name:</strong>
+                <div class="form-control bg-light">@Html.DisplayFor(model => model.Department.DepartmentName)</div>
+            </div>
+            
+        </div>
+        <div class="col-md-6">
+            <div class="mb-2">
+                <strong>Created Date:</strong>
+                <div class="form-control bg-light">@Model.CreatedAt.ToString("dd/MM/yyyy")</div>
+            </div>
+            <div class="mb-2">
+                <strong>Status:</strong>
+                <div class="form-control bg-light">
+                    <span class="badge
+                        @(Model.Status?.ToLower() == "open" ? "bg-success" :
+                          Model.Status?.ToLower() == "closed" ? "bg-danger" :
+                          "bg-warning")">
+                        @Html.DisplayFor(model => model.Status)
+                    </span>
+                </div>
+            </div>
+            <div class="mb-2">
+                <strong>Positions:</strong>
+                <div class="form-control bg-light">@Html.DisplayFor(model => model.NumberOfPositions)</div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <h5 class="text-info"><i class="fas fa-align-left"></i> Job Description</h5>
+    <div class="bg-light p-2 rounded" style="white-space: pre-line; border:1px solid #ccc">@Html.DisplayFor(model => model.Description)</div>
+
+
+    <div class="text-center mt-3">
+        @Html.ActionLink("Edit", "Edit", new { id = Model.VacancyId }, new { @class = "btn btn-warning me-2" })
+        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+    </div>
+</div>
