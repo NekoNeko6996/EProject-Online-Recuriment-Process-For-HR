@@ -19,7 +19,7 @@ public class BaseController : Controller
                 ViewBag.Page = "Index";
                 break;
             case "hrgroup":
-                ViewBag.Controller = "Vacancy";
+                ViewBag.Controller = "Department";
                 ViewBag.Page = "Index";
                 break;
             case "interviewer":

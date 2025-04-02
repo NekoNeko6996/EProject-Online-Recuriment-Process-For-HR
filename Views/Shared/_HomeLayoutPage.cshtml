@@ -55,6 +55,31 @@
             font-size: 1.2rem;
             font-weight: bold;
         }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Giữ tối thiểu 100% chiều cao */
+        }
+
+        .container-fluid {
+            flex: 1; /* Đẩy footer xuống */
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            text-align: center;
+            padding: 10px 0;
+            transition: bottom 0.3s ease-in-out; /* Hiệu ứng trượt */
+        }
+
+            .footer p {
+                margin: 0;
+            }
     </style>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -148,11 +173,12 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid">
+    <div class="container-fluid pb-5">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - HR System</p>
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; @DateTime.Now.Year - HR System. All Rights Reserved.</p>
+            </div>
         </footer>
     </div>
 

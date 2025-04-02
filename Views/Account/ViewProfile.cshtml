@@ -7,59 +7,99 @@
 
 @if (Model == null)
 {
-    <p class="text-danger">Error: Profile data not found.</p>
+    <div class="alert alert-danger text-center mt-5">
+        <strong>Error:</strong> Profile data not found.
+    </div>
 }
 else
 {
     <div class="container mt-5">
-        <h2 class="mb-4">Profile View</h2>
-        <hr />
-
         <div class="row">
-            <!-- Left Navigation -->
-            <div class="col-md-3 sticky-sidebar">
-                <div class="list-group bg-white">
-                    <a href="#" class="list-group-item border-0 border-radius-0 list-group-item-action active">Profile Info</a>
+            <!-- Profile Card -->
+            <div class="col-md-4">
+                <div class="card shadow-sm text-center p-3">
+                    <img src="@Url.Content(Model.ProfileUpdate.AvatarUrl ?? "~/Content/Resources/DefaultImg.png")"
+                         alt="Profile Avatar"
+                         class="rounded-circle mx-auto"
+                         style="width: 120px; height: 120px;">
+                    <h4 class="mt-3">@Model.ProfileUpdate.FirstName @Model.ProfileUpdate.LastName</h4>
+                    <p class="text-muted">@(ViewBag.RoleName.ToUpper())</p>
+                    <textarea class="text-muted text-center border-0" style="resize: none; background-color: transparent" readonly disabled>alskd;ka</textarea>
                 </div>
+
+                @if (!string.IsNullOrEmpty(Model.ProfileUpdate.SocialAccount1) ||
+                !string.IsNullOrEmpty(Model.ProfileUpdate.SocialAccount2) ||
+                !string.IsNullOrEmpty(Model.ProfileUpdate.SocialAccount3))
+                {
+                    <div class="card shadow-sm mt-3">
+                        <ul class="list-group list-group-flush">
+                            @if (!string.IsNullOrEmpty(Model.ProfileUpdate.SocialAccount1))
+                            {
+                                <li class="list-group-item">
+                                    Social Account: 
+                                    <a href="@Model.ProfileUpdate.SocialAccount1" target="_blank">@Model.ProfileUpdate.SocialAccount1</a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ProfileUpdate.SocialAccount2))
+                            {
+                                <li class="list-group-item">
+                                    Social Account:
+                                    <a href="@Model.ProfileUpdate.SocialAccount2" target="_blank">@Model.ProfileUpdate.SocialAccount2</a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ProfileUpdate.SocialAccount3))
+                            {
+                                <li class="list-group-item">
+                                    Social Account:
+                                    <a href="@Model.ProfileUpdate.SocialAccount3" target="_blank">@Model.ProfileUpdate.SocialAccount3</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+
             </div>
 
-            <!-- Profile Info Section -->
-            <div class="col-md-6">
-                <div id="profileSection">
-                    <h5>Personal Information</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item"><strong>First Name:</strong> @Model.ProfileUpdate.FirstName</li>
-                        <li class="list-group-item"><strong>Last Name:</strong> @Model.ProfileUpdate.LastName</li>
-                        <li class="list-group-item"><strong>Email:</strong> @Model.ProfileUpdate.Email</li>
-                        <li class="list-group-item"><strong>Phone Number:</strong> @Model.ProfileUpdate.PhoneNumber</li>
-                        <li class="list-group-item"><strong>Bio:</strong> @Model.ProfileUpdate.Bio</li>
-                    </ul>
-
-                    <hr>
-                    <h5>Social Accounts</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item"><strong>Social Account 1:</strong> @Model.ProfileUpdate.SocialAccount1</li>
-                        <li class="list-group-item"><strong>Social Account 2:</strong> @Model.ProfileUpdate.SocialAccount2</li>
-                        <li class="list-group-item"><strong>Social Account 3:</strong> @Model.ProfileUpdate.SocialAccount3</li>
-                    </ul>
+            <!-- Profile Details -->
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="fw-bold">Personal Information</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Full Name:</strong> @Model.ProfileUpdate.FirstName @Model.ProfileUpdate.LastName</p>
+                                <p><strong>Email:</strong> @Model.ProfileUpdate.Email</p>
+                                <p><strong>Phone:</strong> @Model.ProfileUpdate.PhoneNumber</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Avatar Section -->
-            <div class="col-md-3 d-flex align-items-center flex-column">
-                <h4>Avatar</h4>
-                <img src="@Url.Content(Model.ProfileUpdate.AvatarUrl ?? "~/Content/Resources/DefaultImg.png")"
-                     alt="Profile Avatar"
-                     class="img-thumbnail rounded-circle"
-                     style="width: 150px; height: 150px;">
+                <!-- Project Status -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm p-3">
+                            <h6><em>assignment</em> Interview Statistics</h6>
+
+                            <p>Total Interviews: @ViewBag.TotalInterviews</p>
+
+                            <p>Passed Interviews: @ViewBag.TotalPassed (@(ViewBag.TotalInterviews > 0 ? (ViewBag.TotalPassed * 100 / ViewBag.TotalInterviews) : 0)%)</p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" style="width: @(ViewBag.TotalInterviews > 0 ? (ViewBag.TotalPassed * 100 / ViewBag.TotalInterviews) : 0)%">
+                                </div>
+                            </div>
+
+                            <p>Failed Interviews: @ViewBag.TotalFailed (@(ViewBag.TotalInterviews > 0 ? (ViewBag.TotalFailed * 100 / ViewBag.TotalInterviews) : 0)%)</p>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-danger" style="width: @(ViewBag.TotalInterviews > 0 ? (ViewBag.TotalFailed * 100 / ViewBag.TotalInterviews) : 0)%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-
-    <script>
-        function showSection(sectionId) {
-            document.getElementById("profileSection").style.display = "none";
-            document.getElementById(sectionId).style.display = "block";
-        }
-    </script>
 }

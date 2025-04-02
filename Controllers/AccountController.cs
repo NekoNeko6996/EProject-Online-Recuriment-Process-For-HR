@@ -12,6 +12,7 @@ using System.Linq;
 using Sem3EProjectOnlineCPFH.Services;
 using System.Data.Entity;
 using Sem3EProjectOnlineCPFH.Models.User;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -533,6 +534,11 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                         Id = id
                     }
                 };
+
+                ViewBag.RoleName = UserManager.GetRoles(id).FirstOrDefault();
+                ViewBag.TotalInterviews = db.Interviews.Count(i => i.InterviewerId == id);
+                ViewBag.TotalPassed = db.Interviews.Count(i => i.InterviewerId == id && i.Applicant.Status == ApplicantStatus.HasPassed);
+                ViewBag.TotalFailed = db.Interviews.Count(i => i.InterviewerId == id && i.Applicant.Status == ApplicantStatus.Rejected);
                 return View(profile);
             }
         }
