@@ -60,18 +60,6 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-bold">Status</label>
-                @Html.DropDownListFor(model => model.Status, new SelectList(new[]
-                {
-                    new { Value = "Not in Process", Text = "Not in Process" },
-                    new { Value = "In Process", Text = "In Process" },
-                    new { Value = "Hired", Text = "Hired" },
-                    new { Value = "Banned", Text = "Banned" }
-                }, "Value", "Text"), "Select Status", new { @class = "form-control", required = "required" })
-                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label fw-bold">Created Date</label>
                 @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date", id = "CreatedDate", required = "required" })
                 @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })

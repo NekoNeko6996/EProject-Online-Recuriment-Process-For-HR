@@ -5,6 +5,13 @@
     ViewBag.Title = "Create Vacancy";
 }
 
+@if (@TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <p class="m-0">@TempData["ErrorMessage"]</p>
+    </div>
+}
+
 <div class="d-flex justify-content-center align-items-center vh-90">
     <div class="col-md-6">
         <h3 class="text-center mb-4">Create Vacancy</h3>
@@ -12,6 +19,7 @@
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.Hidden("HasModelError", !ViewData.ModelState.IsValid)
 
             <!-- Vacancy ID -->
             <div class="mb-3">
@@ -41,13 +49,15 @@
                 @Html.ValidationMessageFor(model => model.NumberOfPositions, "", new { @class = "text-danger" })
             </div>
 
-            <!-- Search Department -->
+            <!-- Choose Department -->
             <div class="mb-3 position-relative">
                 <label class="form-label fw-bold">Department Name</label>
-                <input type="text" id="departmentSearch" class="form-control" placeholder="Search department name" value="@ViewBag.DepartmentName" autocomplete="off">
+                <input type="text" id="departmentSearch" class="form-control" placeholder="Search department name"
+                       autocomplete="off">
                 @Html.HiddenFor(model => model.DepartmentId)
                 @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
-                <ul id="departmentSuggestions" class="list-group mt-1 position-absolute w-100 bg-white border shadow-sm" style="z-index: 1000; display: none;"></ul>
+                <ul id="departmentSuggestions" class="list-group mt-1 position-absolute w-100 bg-white border shadow-sm"
+                    style="z-index: 1000; display: none;"></ul>
             </div>
 
             <!-- Created Date -->
@@ -84,60 +94,59 @@
             var departmentInput = $("#departmentSearch");
             var suggestionsList = $("#departmentSuggestions");
 
+            // Lấy danh sách departments từ hidden input
+            var allDepartments = @Html.Raw(Json.Encode(ViewBag.Departments));
+
+            console.log(allDepartments);
+
+            // Hiển thị danh sách khi nhập
             departmentInput.on("keyup", function () {
-                var searchText = $(this).val();
-                if (searchText.length > 1) {
-                    $.ajax({
-                        url: '@Url.Action("SearchDepartment", "Vacancy")',
-                        type: "GET",
-                        data: { term: searchText },
-                        success: function (data) {
-                            suggestionsList.empty().hide();
-                            if (data.length > 0) {
-                                data.forEach(function (item) {
-                                    suggestionsList.append('<li class="list-group-item list-group-item-action" data-id="' + item.id + '">' + item.name + '</li>');
-                                });
-                                suggestionsList.show();
-                            } else {
-                                suggestionsList.append('<li class="list-group-item text-muted">No results found</li>').show();
-                            }
-                        },
-                        error: function () {
-                            console.error("Error fetching department suggestions");
-                        }
-                    });
-                } else {
-                    suggestionsList.empty().hide();
+                var searchText = $(this).val().toLowerCase();
+                suggestionsList.empty().hide();
+
+                if (searchText.length > 0) {
+                    var filtered = allDepartments.filter(d => d.DepartmentName.toLowerCase().includes(searchText));
+
+                    if (filtered.length > 0) {
+                        filtered.forEach(function (item) {
+                            suggestionsList.append('<li class="list-group-item list-group-item-action" data-id="' + item.DepartmentId + '">' + item.DepartmentName + '</li>');
+                        });
+                        suggestionsList.show();
+                    } else {
+                        suggestionsList.append('<li class="list-group-item text-muted">No results found</li>').show();
+                    }
                 }
             });
 
+            // Khi chọn một department
             $(document).on("click", "#departmentSuggestions li", function () {
                 if (!$(this).hasClass("text-muted")) {
                     departmentInput.val($(this).text());
                     $("#DepartmentId").val($(this).attr("data-id"));
                 }
-                suggestionsList.empty().hide();
+                suggestionsList.hide();
             });
 
+            // Đóng danh sách khi click bên ngoài
             $(document).on("click", function (e) {
                 if (!$(e.target).closest("#departmentSearch, #departmentSuggestions").length) {
-                    suggestionsList.empty().hide();
+                    suggestionsList.hide();
                 }
             });
 
-            // Focus vào ô tìm kiếm department khi click vào
-            departmentInput.on("focus", function () {
-                if (suggestionsList.children().length > 0) {
-                    suggestionsList.show();
+            // Khi submit form, kiểm tra nếu không có giá trị hợp lệ thì báo lỗi
+            $("form").on("submit", function () {
+                if (!$("#DepartmentId").val()) {
+                    showAlert('Warning',
+                        [
+                            "Please select a department from the suggestions as you type.",
+                        ],
+                        "Cancel",
+                        () => { }
+                    );
+                    return false;
                 }
             });
-
-            // Đặt ngày mặc định cho CreatedDate nếu chưa có giá trị
-            var createdDateInput = document.getElementById("@Html.IdFor(model => model.CreatedAt)");
-            if (!createdDateInput.value) {
-                var today = new Date().toISOString().split('T')[0];
-                createdDateInput.value = today;
-            }
         });
     </script>
 }

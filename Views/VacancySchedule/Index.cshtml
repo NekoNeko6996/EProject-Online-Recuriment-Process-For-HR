@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Sem3EProjectOnlineCPFH.Models.Data.Vacancy>
 
 @{
-    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Job Vacancy List";
 }
 
@@ -15,12 +15,16 @@
             {
                 <div class="col-md-4 mb-3">
                     <a href="@Url.Action("Details", "VacancySchedule", new { id = vacancy.VacancyId })" class="text-decoration-none">
-                        <div class="card shadow-lg border-0 vacancy-card">
+                        <div class="card border-1 vacancy-card">
                             <div class="card-body">
-                                <h5 class="card-title text-dark">@vacancy.Title</h5>
-                                <span class="badge @(vacancy.Status == "Open" ? "bg-success" : "bg-danger")">
-                                    @vacancy.Status
-                                </span>
+                                <div class="d-flex flex-row justify-content-between">
+                                    <h5 class="card-title text-dark m-0">@vacancy.Title</h5>
+                                    <span class="badge @(vacancy.Status == "Open" ? "bg-success" : "bg-danger")">
+                                        @vacancy.Status
+                                    </span>
+                                </div>
+                                <hr />
+                                <p class="text-muted">VID: @vacancy.VacancyId</p>
                                 <p class="text-muted mt-2">Positions Available: @vacancy.NumberOfPositions</p>
                                 <p class="text-muted">Created Date: @vacancy.CreatedAt.ToString("dd/MM/yyyy")</p>
                             </div>

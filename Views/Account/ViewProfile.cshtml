@@ -1,0 +1,65 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Auth.ProfileSettingsViewModel
+
+@{
+    ViewBag.Title = "Profile View";
+    Layout = "~/Views/Shared/_HomeLayoutPage.cshtml";
+}
+
+@if (Model == null)
+{
+    <p class="text-danger">Error: Profile data not found.</p>
+}
+else
+{
+    <div class="container mt-5">
+        <h2 class="mb-4">Profile View</h2>
+        <hr />
+
+        <div class="row">
+            <!-- Left Navigation -->
+            <div class="col-md-3 sticky-sidebar">
+                <div class="list-group bg-white">
+                    <a href="#" class="list-group-item border-0 border-radius-0 list-group-item-action active">Profile Info</a>
+                </div>
+            </div>
+
+            <!-- Profile Info Section -->
+            <div class="col-md-6">
+                <div id="profileSection">
+                    <h5>Personal Information</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>First Name:</strong> @Model.ProfileUpdate.FirstName</li>
+                        <li class="list-group-item"><strong>Last Name:</strong> @Model.ProfileUpdate.LastName</li>
+                        <li class="list-group-item"><strong>Email:</strong> @Model.ProfileUpdate.Email</li>
+                        <li class="list-group-item"><strong>Phone Number:</strong> @Model.ProfileUpdate.PhoneNumber</li>
+                        <li class="list-group-item"><strong>Bio:</strong> @Model.ProfileUpdate.Bio</li>
+                    </ul>
+
+                    <hr>
+                    <h5>Social Accounts</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Social Account 1:</strong> @Model.ProfileUpdate.SocialAccount1</li>
+                        <li class="list-group-item"><strong>Social Account 2:</strong> @Model.ProfileUpdate.SocialAccount2</li>
+                        <li class="list-group-item"><strong>Social Account 3:</strong> @Model.ProfileUpdate.SocialAccount3</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Avatar Section -->
+            <div class="col-md-3 d-flex align-items-center flex-column">
+                <h4>Avatar</h4>
+                <img src="@Url.Content(Model.ProfileUpdate.AvatarUrl ?? "~/Content/Resources/DefaultImg.png")"
+                     alt="Profile Avatar"
+                     class="img-thumbnail rounded-circle"
+                     style="width: 150px; height: 150px;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.getElementById("profileSection").style.display = "none";
+            document.getElementById(sectionId).style.display = "block";
+        }
+    </script>
+}

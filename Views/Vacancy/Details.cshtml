@@ -1,12 +1,32 @@
-﻿@model Sem3EProjectOnlineCPFH.Models.Data.Vacancy
+﻿@using Sem3EProjectOnlineCPFH.Models.Enum;
+@model Sem3EProjectOnlineCPFH.Models.Data.Vacancy
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Vacancy Details";
 }
 
-<div class="container mt-4 p-4 rounded" style="background-color: #f8f9fa;">
+<div class="mt-3">
+    @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-outline-secondary" })
+</div>
+<div class="container mt-4 p-4 rounded" style="border: 1px solid #CCC">
     <h3 class="text-primary mb-3"><i class="fas fa-briefcase me-2"></i>Vacancy Details</h3>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <div class="row">
         <div class="col-md-6">
@@ -26,7 +46,6 @@
                 <strong>Department Name:</strong>
                 <div class="form-control bg-light">@Html.DisplayFor(model => model.Department.DepartmentName)</div>
             </div>
-            
         </div>
         <div class="col-md-6">
             <div class="mb-2">
@@ -54,10 +73,114 @@
     <hr />
     <h5 class="text-info"><i class="fas fa-align-left"></i> Job Description</h5>
     <div class="bg-light p-2 rounded" style="white-space: pre-line; border:1px solid #ccc">@Html.DisplayFor(model => model.Description)</div>
+    <hr />
 
-
-    <div class="text-center mt-3">
-        @Html.ActionLink("Edit", "Edit", new { id = Model.VacancyId }, new { @class = "btn btn-warning me-2" })
-        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
-    </div>
+    <h5 class="text-info"><i class="fas fa-user-tie"></i> Applicants</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Applied At</th>
+                <th>Information</th>
+                <th>Status</th>
+                @if (Model.Status == "Open")
+                {
+                    <th>Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.Applicants != null)
+            {
+                foreach (var applicant in ViewBag.Applicants)
+                {
+                    <tr>
+                        <td>@applicant.Applicant.FullName</td>
+                        <td>@applicant.Applicant.Email</td>
+                        <td>@applicant.Applicant.PhoneNumber</td>
+                        <td>@applicant.ApplyAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(applicant.Applicant.CVPath))
+                            {
+                                <a href="@Url.Content(applicant.Applicant.CVPath)" class="btn btn-primary btn-sm" target="_blank">View CV</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No CV</span>
+                            }
+                            <a class="btn btn-outline-info btn-sm" href="@Url.Action("Details", "Applicant", new { id = applicant.ApplicantId, returnurl = Request.RawUrl})">Applicant Info</a>
+                        </td>
+                        <td>
+                            <span class="badge p-2
+                                @(applicant.Applicant.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                applicant.Applicant.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                applicant.Applicant.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                applicant.Applicant.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                applicant.Applicant.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                "bg-secondary")">
+                                @applicant.Applicant.Status
+                            </span>
+                        </td>
+                        <td>
+                            @if (Model.Status == "Open" && applicant.Applicant.Status == ApplicantStatus.Added)
+                            {
+                                <a class="btn btn-outline-danger btn-sm" href="@Url.Action("RemoveApplicant", "Vacancy", new { VacancyId = Model.VacancyId, ApplicantId = applicant.ApplicantId })">Remove</a>
+                            }
+                        </td>
+                        
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No applicants found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+@if (Model.Status == "Open")
+{
+    <div class="container mt-4 p-4 rounded" style="border: 1px solid #CCC">
+        <h5 class="text-info"><i class="fas fa-user-plus"></i> All Applicants</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>More Info</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.AllApplicants != null)
+                {
+                    foreach (var applicant in ViewBag.AllApplicants)
+                    {
+                        <tr>
+                            <td>@applicant.FullName</td>
+                            <td>@applicant.Email</td>
+                            <td>@applicant.PhoneNumber</td>
+                            <td>
+                                <a class="btn btn-outline-info btn-sm" href="@Url.Action("Details", "Applicant", new { id = applicant.ApplicantId, returnurl = Request.RawUrl})">Applicant Info</a>
+                            </td>
+                            <td>
+                                @Html.ActionLink("Add To Vacancy", "AddApplicantToVacancy", "Vacancy", new { ApplicantId = applicant.ApplicantId, VacancyId = Model.VacancyId }, new { @class = "btn btn-outline-primary btn-sm" })
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No applicants available.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

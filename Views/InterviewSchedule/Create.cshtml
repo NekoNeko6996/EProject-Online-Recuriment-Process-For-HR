@@ -1,11 +1,11 @@
 ﻿@model Sem3EProjectOnlineCPFH.Models.Data.Interview
 
 @{
-    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Create New Interview";
 
-    string AID = Request.QueryString["AID"];
-    string VID = Request.QueryString["VID"];
+    string AID = Request.QueryString["AID"] ?? ViewBag.AID ?? "";
+    string VID = Request.QueryString["VID"] ?? ViewBag.VID ?? "";
 }
 
 <div class="container mt-4">
@@ -18,12 +18,19 @@
         </div>
     }
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     @using (Html.BeginForm("Create", "InterviewSchedule", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
     {
         @Html.AntiForgeryToken()
         <div class="row">
             <!-- Column 1: Interview Details -->
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Interview Details</h5>
@@ -103,7 +110,6 @@
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary btn-lg px-4">Save Interview</button>
             </div>
-            }
         </div>
 
         <!-- Modal -->
@@ -118,9 +124,9 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>More Info</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -130,9 +136,11 @@
                                     foreach (var interviewer in ViewBag.Interviewers)
                                     {
                                         <tr>
-                                            <td>@interviewer.InterviewerId</td>
                                             <td>@(interviewer.LastName + " " + interviewer.FirstName)</td>
                                             <td>@interviewer.Email</td>
+                                            <td>
+                                                <a class="btn btn-info btn-sm" target="_blank" href="@Url.Action("ViewProfile", "Account", new { id = interviewer.InterviewerId })">View</a>
+                                            </td>
                                             <td>
                                                 <button type="button" class="btn btn-primary btn-sm select-interviewer"
                                                         data-id="@interviewer.InterviewerId" data-name="@(interviewer.FirstName + " " + interviewer.FirstName)">
@@ -148,7 +156,8 @@
                 </div>
             </div>
         </div>
-}
+    }
+</div>
 
 @section Scripts {
     <script>

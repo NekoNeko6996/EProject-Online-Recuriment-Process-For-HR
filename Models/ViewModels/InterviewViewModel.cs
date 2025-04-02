@@ -1,4 +1,5 @@
 ﻿using System;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 
 namespace Sem3EProjectOnlineCPFH.Models.ViewModels
 {
@@ -15,6 +16,6 @@ namespace Sem3EProjectOnlineCPFH.Models.ViewModels
         public string InterviewMethod { get; set; }
         public string MeetUrl { get; set; }
 
-        public string Status { get; set; }
+        public InterviewStatus Status { get; set; }
     }
 }

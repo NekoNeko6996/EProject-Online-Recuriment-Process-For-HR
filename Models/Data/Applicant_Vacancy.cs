@@ -15,7 +15,7 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
 
         public string ApplicantId { get; set; }
         public string VacancyId { get; set; }
-        public int Approver { get; set; }
+        public string Approver { get; set; }
         public DateTime ApplyAt { get; set; }
 
         [ForeignKey("ApplicantId")]

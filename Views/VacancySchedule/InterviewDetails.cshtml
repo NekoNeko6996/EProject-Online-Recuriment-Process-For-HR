@@ -1,0 +1,202 @@
+﻿@using Sem3EProjectOnlineCPFH.Models.Enum
+@model Sem3EProjectOnlineCPFH.Models.Data.Interview
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Interview Details";
+    string VID = Request.QueryString["VID"];
+}
+
+<style>
+    .card {
+        border-radius: 0.35rem;
+        border: 1px solid #CCC;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        font-weight: 600;
+    }
+
+    dt {
+        font-weight: 500;
+        color: #6c757d;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.35em 0.65em;
+    }
+</style>
+
+<div class="container">
+    <h2>Interview Details</h2>
+    <hr />
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Candidate Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">Candidate Information</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Full Name:</dt>
+                        <dd class="col-sm-8">@Model.Applicant.FullName</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.Applicant.Email</dd>
+
+                        <dt class="col-sm-4">Phone Number:</dt>
+                        <dd class="col-sm-8">@(Model.Applicant.PhoneNumber ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">CV:</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.Applicant.CVPath))
+                            {
+                                <a href="@Url.Content(Model.Applicant.CVPath)" target="_blank" class="btn btn-sm btn-outline-primary">View CV</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not available</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            @if (Model.Status != InterviewStatus.Cancelled)
+            {
+                <div class="card mb-4">
+                    <div class="card-body d-flex flex-row gap-2">
+                        @if (Model.Status == InterviewStatus.Scheduled)
+                        {
+                            using (Html.BeginForm("Postpone", "InterviewSchedule", new { id = Model.InterviewId }, FormMethod.Post, new { id = "pos-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("InterviewId", Model.InterviewId)
+                                @Html.Hidden("VID", Model.VacancyId)
+                                <button onclick="confirmPos()" class="btn btn-outline-warning">Postpone this Interview</button>
+                            }
+                        }
+
+                        @if (Model.Status == InterviewStatus.Postponed)
+                        {
+                            using (Html.BeginForm("Postpone", "InterviewSchedule", FormMethod.Post, new { id = "pos-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("InterviewId", Model.InterviewId)
+                                @Html.Hidden("VID", Model.VacancyId)
+                                <button onclick="confirmPos()" class="btn btn-outline-warning">Continue this Interview</button>
+                            }
+                        }
+
+                        @if (Model.Status == InterviewStatus.Scheduled || Model.Status == InterviewStatus.Postponed)
+                        {
+                            using (Html.BeginForm("Cancel", "InterviewSchedule", new { id = Model.InterviewId }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("InterviewId", Model.InterviewId)
+                                @Html.Hidden("VID", Model.VacancyId)
+                                <button class="btn btn-outline-danger">Cancel this Interview</button>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Interview Details Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="card-title mb-0">Interview Details</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Interview ID:</dt>
+                        <dd class="col-sm-8">@Model.InterviewId</dd>
+
+                        <dt class="col-sm-4">Date:</dt>
+                        <dd class="col-sm-8">@Model.ScheduledDate.ToString("MM/dd/yyyy")</dd>
+
+                        <dt class="col-sm-4">Time:</dt>
+                        <dd class="col-sm-8">@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</dd>
+
+                        <dt class="col-sm-4">Method:</dt>
+                        <dd class="col-sm-8">@Model.InterviewMethod</dd>
+
+                        @if (Model.InterviewMethod == "Online" && !string.IsNullOrEmpty(Model.InterviewURL))
+                        {
+                            <dt class="col-sm-4">Meeting URL:</dt>
+                            <dd class="col-sm-8">
+                                <a href="@Model.InterviewURL" target="_blank" class="btn btn-sm btn-outline-primary">Join Meeting</a>
+                            </dd>
+                        }
+
+                        <dt class="col-sm-4">Interviewer:</dt>
+                        <dd class="col-sm-8">@Model.Interviewer.UserName</dd>
+
+                        <dt class="col-sm-4">Position:</dt>
+                        <dd class="col-sm-8">@Model.Vacancy.Title</dd>
+
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge @(Model.Status.ToString() == "Completed" ? "bg-success" :
+                                              Model.Status.ToString() == "Scheduled" ? "bg-primary" :
+                                              "bg-warning")">
+                                @Model.Status
+                            </span>
+                        </dd>
+
+                        @if (!string.IsNullOrEmpty(Model.Result))
+                        {
+                            <dt class="col-sm-4">Result:</dt>
+                            <dd class="col-sm-8">@Model.Result</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <a href="@Url.Action("Details", new { id = VID })" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirm() {
+        showAlert('Warning',
+            [
+                "Are you sure you want to postpone this interview?"
+            ],
+            "Confirm",
+            function () {
+                document.getElementById("pos-form").submit();
+            }
+        );
+    }
+</script>
+

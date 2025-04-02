@@ -1,17 +1,34 @@
 ﻿@using Sem3EProjectOnlineCPFH.Models.ViewModels
+@using Sem3EProjectOnlineCPFH.Models.Enum
 @model VacancyViewModel
 
 @{
-    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Vacancy Details";
 }
 
 <div class="container mt-4">
-    <h2 class="text-center text-primary mb-4">📌 Vacancy Details</h2>
+    <h2 class="text-center text-primary mb-4">Vacancy Details</h2>
 
     <a href="@Url.Action("Index", "VacancySchedule")" class="btn btn-outline-secondary mb-3">
         <i class="fas fa-arrow-left"></i> Back
     </a>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <!-- Vacancy Information -->
     <div class="card shadow-sm p-3 mb-4">
@@ -35,17 +52,52 @@
         <hr>
         @if (Model.Applicants != null && Model.Applicants.Any())
         {
-            <ul class="list-group">
-                @foreach (var applicant in Model.Applicants)
-                {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="@Url.Action("Create", "InterviewSchedule", new { AID = applicant.ApplicantId, VID = @Model.Vacancy.VacancyId })">
-                            <span><i class="fas fa-user"></i> @applicant.FullName</span>
-                            <span class="text-muted"><i class="fas fa-envelope"></i> @applicant.Email</span>
-                        </a>
-                    </li>
-                }
-            </ul>
+            <table class="table table-hover">
+                <thead class="text-center">
+                    <tr>
+                        <th><i class="fas fa-id-card"></i> ID</th>
+                        <th><i class="fas fa-user"></i> Full Name</th>
+                        <th><i class="fas fa-envelope"></i> Email</th>
+                        <th><i class="fas fa-phone"></i> Phone Number</th>
+                        <th><i class="fas fa-file"></i> CV</th>
+                        <th><i class="fas fa-cog"></i> Action</th>
+                    </tr>
+                <tbody class="text-center">
+                    @foreach (var applicant in Model.Applicants)
+                    {
+                        <tr>
+                            <td>@applicant.ApplicantId</td>
+                            <td>@applicant.FullName</td>
+                            <td>@applicant.Email</td>
+                            <td>@applicant.PhoneNumber</td>
+                            @*cv*@
+                            <td>
+                                <a href="@Url.Content(@applicant.CVPath)" class="btn btn-outline-primary btn-sm">
+                                    Download CV
+                                </a>
+                            <td>
+                                @if (applicant.Status == ApplicantStatus.Scheduled)
+                                {
+                                    <a class="btn btn-outline-warning btn-sm" href="@Url.Action("Edit", "InterviewSchedule", new { id = Model.Interviews.Where(i => i.ApplicantId == applicant.ApplicantId).FirstOrDefault().Id, VID = Model.Vacancy.VacancyId})">
+                                        Edit Interview
+                                    </a>
+                                }
+                                else
+                                if (applicant.Status == ApplicantStatus.Added)
+                                {
+                                    <a class="btn btn-outline-primary btn-sm" href="@Url.Action("Create", "InterviewSchedule", new { VID = Model.Vacancy.VacancyId, AID = applicant.ApplicantId })">
+                                        Schedule Interview
+                                    </a>
+                                }
+                                else
+                                {
+                                    <p></p>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
         else
         {
@@ -61,15 +113,14 @@
             <table class="table table-striped table-hover text-center align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th><i class="fas fa-user"></i> Applicant</th>
                         <th><i class="fas fa-user"></i> Applicant Name</th>
                         <th><i class="fas fa-user-tie"></i> Interviewer Name</th>
                         <th><i class="fas fa-calendar"></i> Date</th>
                         <th><i class="fas fa-clock"></i> Start Time</th>
                         <th><i class="fas fa-clock"></i> End Time</th>
                         <th><i class="fas fa-video"></i> Method</th>
-                        <th><i class="fas fa-link"></i> Meet URL</th>
                         <th><i class="fas fa-info-circle"></i> Status</th>
+                        <th><i class="fas fa-cog"></i> Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -78,18 +129,21 @@
                         foreach (var interview in Model.Interviews)
                         {
                             <tr>
-                                <td>@interview.ApplicantId</td>
                                 <td>@interview.ApplicantName</td>
                                 <td>@interview.InterviewerName</td>
                                 <td>@interview.ScheduledDate.ToString("dd/MM/yyyy")</td>
                                 <td>@interview.StartTime</td>
                                 <td>@interview.EndTime</td>
                                 <td>@interview.InterviewMethod</td>
-                                <td>@interview.MeetUrl</td>
                                 <td>
-                                    <span class="badge @(interview.Status == "Scheduled" ? "bg-warning text-dark" : interview.Status == "Completed" ? "bg-success" : "bg-danger")">
+                                    <span class="badge @(interview.Status == InterviewStatus.Scheduled ? "bg-warning text-dark" : interview.Status == InterviewStatus.Completed ? "bg-success" : "bg-danger")">
                                         @interview.Status
                                     </span>
+                                </td>
+                                <td>
+                                    <a class="btn btn-outline-success btn-sm" href="@Url.Action("InterviewDetails", "VacancySchedule", new { id = interview.Id, VID = Model.Vacancy.VacancyId })">
+                                        Details
+                                    </a>
                                 </td>
                             </tr>
                         }
@@ -97,7 +151,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="6" class="text-center text-muted">
+                            <td colspan="9" class="text-center text-muted">
                                 <i class="fas fa-exclamation-circle"></i> No interview scheduled.
                             </td>
                         </tr>
@@ -107,8 +161,3 @@
         </div>
     </div>
 </div>
-
-<!-- Include Bootstrap & FontAwesome if not already included -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

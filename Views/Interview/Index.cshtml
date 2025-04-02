@@ -1,0 +1,512 @@
+﻿@using Sem3EProjectOnlineCPFH.Models.Enum
+@model Sem3EProjectOnlineCPFH.Models.Data.Interview
+@{
+    Layout = "~/Views/Shared/_InterviewLayout.cshtml";
+    ViewBag.Title = "Applicant Details & Interview";
+}
+
+<div class="interview-container">
+
+    <div class="interview-header">
+        <h2><i class="bi bi-person-badge"></i> @ViewBag.Title</h2>
+        <div class="header-actions">
+            <a href="@Url.Action("Index", "Candidate", new { vacancyId = Model.Vacancy?.VacancyId })" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+
+    <div class="card applicant-card">
+        <div class="card-header">
+            <h3><i class="bi bi-person-vcard"></i> Applicant Information</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-3">
+                    <div class="avatar-container text-center mb-3">
+                        <div class="avatar-frame">
+                            @if (!string.IsNullOrEmpty(Model.Applicant.AvatarPath))
+                            {
+                                <img src="@Url.Content(Model.Applicant.AvatarPath)" class="avatar-image" alt="Candidate Avatar" />
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">
+                                    <i class="bi bi-person-circle" style="font-size: 3rem; color: #6c757d;"></i>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4 mt-5 ">
+                    <div class="info-item">
+                        <label>Applicant ID:</label>
+                        <span>@Model.ApplicantId</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Full Name:</label>
+                        <span>@Model.Applicant.FullName</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Email:</label>
+                        <span>@Model.Applicant.Email</span>
+                    </div>
+                </div>
+
+
+                <div class="col-md-5 mt-5">
+                    <div class="info-item">
+                        <label>Status:</label>
+                        <span class="status-badge @(Model.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                Model.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                Model.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                Model.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                Model.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                "bg-secondary") text-white">
+                            @Model.Applicant.Status
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone:</label>
+                        <span>@(Model.Applicant.PhoneNumber ?? "N/A")</span>
+                    </div>
+                    <div class="info-item">
+                        <label>CV:</label>
+                        @if (!string.IsNullOrEmpty(Model.Applicant.CVPath))
+                        {
+                            <a href="@Url.Content(Model.Applicant.CVPath)" target="_blank" class="btn-view-cv">
+                                <i class="bi bi-file-earmark-pdf"></i> View CV
+                            </a>
+                        }
+                        else
+                        {
+                            <span>No CV</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card positions-card">
+        <div class="card-header">
+            <h3><i class="bi bi-briefcase"></i> Applied Positions</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.Applicant.ApplicantVacancies != null && Model.Applicant.ApplicantVacancies.Any())
+            {
+                <div class="positions-grid">
+                    @foreach (var application in Model.Applicant.ApplicantVacancies)
+                    {
+                        <div class="position-item">
+                            <div class="position-id">#@application.VacancyId</div>
+                            <h4>@(application.Vacancy?.Title ?? "N/A")</h4>
+                            <div class="position-meta">
+                                <span><i class="bi bi-building"></i> @(application.Vacancy.Department.DepartmentName ?? "N/A")</span>
+                                <span><i class="bi bi-calendar"></i> @(application.ApplyAt.ToString("dd/MM/yyyy"))</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="no-positions">
+                    <i class="bi bi-exclamation-circle"></i> No applied positions
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <div class="card interview-card">
+        <div class="card-header">
+            <h3><i class="bi bi-chat-square-text"></i> Interview Information</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.Status != InterviewStatus.Scheduled)
+            {
+                <div class="no-interview">
+                    <i class="bi bi-calendar-x"></i> No interview scheduled
+                    <a href="#" class="btn btn-primary btn-schedule">
+                        <i class="bi bi-plus-circle"></i> Schedule Interview
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="interview-details">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label>Interview ID:</label>
+                                <span>@Model.InterviewId</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Position:</label>
+                                <span>@(Model.Vacancy?.Title ?? "N/A")</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Date:</label>
+                                <span>@(Model.ScheduledDate.ToString("dd/MM/yyyy"))</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Inter Method:</label>
+                                <span>@Model.InterviewMethod</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label>Time:</label>
+                                <span>@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Status:</label>
+                                <span class="status-badge @(Model.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                    Model.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                    Model.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                    Model.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                    Model.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                    "bg-secondary") text-white">
+                                    @Model.Status
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <label>Result:</label>
+                                @if (!string.IsNullOrEmpty(Model.Result))
+                                {
+                                    <span class="status-badge @(Model.Result == "Selected" ? "status-passed" : "status-failed")">
+                                        @Model.Result
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not evaluated</span>
+                                }
+                            </div>
+                            @if (Model.InterviewMethod.ToLower() == "online")
+                            {
+                                <div class="info-item">
+                                    <label>Interview URL:</label>
+                                    <a href="@Model.InterviewURL">@Model.InterviewURL</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interview-actions">
+                    @if (string.IsNullOrEmpty(Model.Result))
+                    {
+                        <form action="@Url.Action("UpdateResult", "Interview")" method="post">
+                            <input type="hidden" name="interviewId" value="@Model.InterviewId" />
+                            <input type="hidden" name="applicantId" value="@Model.ApplicantId" />
+
+                            <div class="result-form">
+                                <button type="submit" name="result" value="Selected" class="btn btn-passed">
+                                    <i class="bi bi-check-circle"></i> Selected
+                                </button>
+                                <button type="submit" name="result" value="Rejected" class="btn btn-failed">
+                                    <i class="bi bi-x-circle"></i> Rejected
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="result-updated">
+                            <i class="bi bi-check2-circle"></i> Result updated:
+                            <span class="status-badge @(Model.Result == "Selected" ? "status-passed" : "status-failed") me-2 ">
+                                @Model.Result
+                            </span>
+                            <a href="@Url.Action("Index", "InterviewResult", new { resultType = Model.Result })" class="btn btn-outline-primary ">
+                                <i class="bi bi-list-ul"></i> View @(Model.Result == "Selected" ? "selected" : "rejected") list
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .interview-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+
+    .interview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .interview-header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+
+    .header-actions .btn {
+        margin-left: 10px;
+    }
+
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        padding: 15px 20px;
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #2c3e50;
+        }
+
+    .card-body {
+        padding: 20px;
+    }
+
+
+    .info-item {
+        display: flex;
+        margin-bottom: 15px;
+    }
+
+        .info-item label {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+        }
+
+        .info-item span {
+            color: #333;
+        }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-approved {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-rejected {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-primary {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-secondary {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+
+    .status-scheduled {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-passed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-failed {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+
+    .positions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .position-item {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .position-id {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .position-item h4 {
+        font-size: 1.1rem;
+        margin: 5px 0 10px;
+        color: #2c3e50;
+    }
+
+    .position-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+        .position-meta i {
+            margin-right: 5px;
+        }
+
+    .no-positions,
+    .no-interview {
+        text-align: center;
+        padding: 30px;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+        .no-positions i,
+        .no-interview i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+    .interview-actions {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        text-align: center;
+    }
+
+    .result-form {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .btn-passed {
+        background-color: #28a745;
+        color: white;
+        min-width: 120px;
+    }
+
+    .btn-failed {
+        background-color: #dc3545;
+        color: white;
+        min-width: 120px;
+    }
+
+    .result-updated {
+        color: #28a745;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+
+    .btn-view-cv {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .btn-view-cv i {
+            margin-right: 5px;
+        }
+
+    .avatar-container {
+        padding: 10px;
+    }
+
+    .avatar-frame {
+        width: 150px;
+        height: 180px;
+        border: 2px solid #0D6EFD;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin: 0 auto;
+        background-color: #f8f9fa;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+    }
+
+
+    .info-item {
+        margin-bottom: 12px;
+        min-height: 24px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var form = document.getElementsByTagName("form");
+        var overlay = document.getElementById("loading-overlay");
+
+        form.addEventListener("submit", function () {
+            overlay.style.display = "flex"; // Hiển thị loading
+        });
+    });
+</script>
+
+
+<div id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Loading ...</p>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">

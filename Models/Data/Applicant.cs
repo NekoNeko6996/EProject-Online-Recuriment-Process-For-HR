@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 using System.Linq;
 using System.Web;
 
@@ -22,7 +23,7 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
         public string PhoneNumber { get; set; }
         public string CVPath { get; set; }
         public string AvatarPath { get; set; }
-        public string Status { get; set; }
+        public ApplicantStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public string AttachedVacancies { get; set; }
 

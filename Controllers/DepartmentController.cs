@@ -7,10 +7,10 @@ using Sem3EProjectOnlineCPFH.Models.Data;
 using System.Data.Entity;
 using PagedList;
 
-namespace RecruitmentProces.Controllers
+namespace Sem3EProjectOnlineCPFH.Controllers
 {
     [Authorize(Roles = "hrgroup")]
-    public class DepartmentController : Controller
+    public class DepartmentController : BaseController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
@@ -144,13 +144,26 @@ namespace RecruitmentProces.Controllers
         // POST: Department/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
+        public ActionResult DeleteConfirmed(string DepartmentId)
         {
-            Department department = db.Departments.Find(id);
+            Department department = db.Departments.Find(DepartmentId);
             if (department != null)
             {
-                db.Departments.Remove(department);
-                db.SaveChanges();
+                // check if department is used in vacancy
+                if (db.Vacancies.Any(v => v.DepartmentId == DepartmentId))
+                {
+                    TempData["ErrorMessage"] = "Cannot delete department because it is used in vacancies.";
+                }
+                else
+                {
+                    db.Departments.Remove(department);
+                    db.SaveChanges();
+                    TempData["SuccessMessage"] = "Department deleted successfully.";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Department not found.";
             }
             return RedirectToAction("Index");
         }

@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Mvc;
 using Sem3EProjectOnlineCPFH.Models;
 using Sem3EProjectOnlineCPFH.Models.Data;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 using System.Data.Entity;
 using PagedList;
 using System.Web;
@@ -12,7 +13,7 @@ using System.IO;
 namespace RecruitmentProces.Controllers
 {
     [Authorize(Roles = "hrgroup")]
-    public class ApplicantController : Controller
+    public class ApplicantController : BaseController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private readonly string savePath = "~/Content/Resources/Applicant/Upload/";
@@ -55,7 +56,7 @@ namespace RecruitmentProces.Controllers
             }
 
             ViewBag.Search = search;
-            return View(applicants.OrderBy(a => a.FullName).ToPagedList(pageNumber, pageSize));
+            return View(applicants.OrderByDescending(a => a.CreatedAt).ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Applicant/Create
@@ -99,6 +100,10 @@ namespace RecruitmentProces.Controllers
                     AvatarFile.SaveAs(avatarPath);
                     applicant.AvatarPath = savePath + "Avatars/" + avatarFileName;
                 }
+                else
+                {
+                    applicant.AvatarPath = ViewBag.DefaultAvatar;
+                }
 
                 // Lưu CV với tên file ngẫu nhiên
                 if (CVFile != null && CVFile.ContentLength > 0)
@@ -113,6 +118,7 @@ namespace RecruitmentProces.Controllers
 
                 // Lưu Vacancy Name (nếu có)
                 applicant.AttachedVacancies = VacancyInput;
+                applicant.Status = ApplicantStatus.NotApproved;
 
                 // Lưu vào database
                 db.Applicants.Add(applicant);
@@ -137,7 +143,7 @@ namespace RecruitmentProces.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Applicant model, HttpPostedFileBase AvatarFile, HttpPostedFileBase CVFile, bool? DeleteAvatar, bool? DeleteCV)
+        public ActionResult Edit(Applicant model, HttpPostedFileBase AvatarFile, HttpPostedFileBase CVFile)
         {
             if (ModelState.IsValid)
             {
@@ -147,10 +153,16 @@ namespace RecruitmentProces.Controllers
                     return HttpNotFound();
                 }
 
-                // Xử lý Avatar
-                if (DeleteAvatar == true)
+                if (AvatarFile != null && AvatarFile.ContentLength > 0)
                 {
-                    if (!string.IsNullOrEmpty(applicant.AvatarPath))
+                    // generate new avatar name
+                    string avatarName = Guid.NewGuid().ToString() + Path.GetExtension(AvatarFile.FileName);
+                    string avatarPath = savePath + "Avatars/" + avatarName;
+                    AvatarFile.SaveAs(Server.MapPath(avatarPath));
+
+
+                    // check if not default avatar delete old avatar
+                    if (!string.IsNullOrEmpty(applicant.AvatarPath) && !applicant.AvatarPath.Contains(ViewBag.DefaultAvatar))
                     {
                         string fullPath = Server.MapPath(applicant.AvatarPath);
                         if (System.IO.File.Exists(fullPath))
@@ -158,32 +170,14 @@ namespace RecruitmentProces.Controllers
                             System.IO.File.Delete(fullPath);
                         }
                     }
-                    applicant.AvatarPath = null;
-                }
-                else if (AvatarFile != null && AvatarFile.ContentLength > 0)
-                {
-                    string avatarName = Path.GetFileName(AvatarFile.FileName);
-                    string avatarPath = savePath + "Avatars/" + avatarName;
-                    AvatarFile.SaveAs(Server.MapPath(avatarPath));
+
                     applicant.AvatarPath = avatarPath;
                 }
 
-                // Xử lý CV
-                if (DeleteCV == true)
+                if (CVFile != null && CVFile.ContentLength > 0)
                 {
-                    if (!string.IsNullOrEmpty(applicant.CVPath))
-                    {
-                        string fullPath = Server.MapPath(applicant.CVPath);
-                        if (System.IO.File.Exists(fullPath))
-                        {
-                            System.IO.File.Delete(fullPath);
-                        }
-                    }
-                    applicant.CVPath = null;
-                }
-                else if (CVFile != null && CVFile.ContentLength > 0)
-                {
-                    string cvName = Path.GetFileName(CVFile.FileName);
+                    // generate new cv name
+                    string cvName = Guid.NewGuid().ToString() + Path.GetExtension(CVFile.FileName);
                     string cvPath = savePath + "CVs/" + cvName;
                     CVFile.SaveAs(Server.MapPath(cvPath));
                     applicant.CVPath = cvPath;
@@ -193,7 +187,6 @@ namespace RecruitmentProces.Controllers
                 applicant.FullName = model.FullName;
                 applicant.Email = model.Email;
                 applicant.PhoneNumber = model.PhoneNumber;
-                applicant.Status = model.Status;
                 applicant.CreatedAt = model.CreatedAt;
 
                 db.SaveChanges();
@@ -224,7 +217,7 @@ namespace RecruitmentProces.Controllers
             if (applicant == null) return HttpNotFound();
 
             // Xóa Avatar nếu có
-            if (!string.IsNullOrEmpty(applicant.AvatarPath))
+            if (!string.IsNullOrEmpty(applicant.AvatarPath) && !applicant.AvatarPath.Contains(ViewBag.DefaultAvatar))
             {
                 string fullPath = Server.MapPath(applicant.AvatarPath);
                 if (System.IO.File.Exists(fullPath))

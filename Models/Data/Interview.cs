@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using Sem3EProjectOnlineCPFH.Models.Auth;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 
 namespace Sem3EProjectOnlineCPFH.Models.Data
 {
@@ -40,7 +41,7 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
         [DataType(DataType.Time)]
         public TimeSpan EndTime { get; set; }
 
-        public string Status { get; set; }
+        public InterviewStatus Status { get; set; }
         public string Result { get; set; }
 
         [ForeignKey("ApplicantId")]

@@ -1,5 +1,5 @@
 ﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="packages\EntityFramework.6.5.1\build\EntityFramework.props" Condition="Exists('packages\EntityFramework.6.5.1\build\EntityFramework.props')" />
   <Import Project="packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -49,10 +49,10 @@
       <HintPath>packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>packages\EntityFramework.6.5.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.AspNet.Identity.Core.2.2.4\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -223,12 +223,15 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ApplicantController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ApplicantInterviewController.cs" />
     <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\HRGroupController.cs" />
+    <Compile Include="Controllers\InterviewController.cs" />
+    <Compile Include="Controllers\InterviewResultController.cs" />
     <Compile Include="Controllers\InterviewScheduleController.cs" />
     <Compile Include="Controllers\VacancyController.cs" />
+    <Compile Include="Controllers\VacancyInterviewController.cs" />
     <Compile Include="Controllers\VacancyScheduleController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -247,6 +250,22 @@
     <Compile Include="Migrations\202503301638460_finalupdatev3.Designer.cs">
       <DependentUpon>202503301638460_finalupdatev3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202503310259360_finalupdatev4.cs" />
+    <Compile Include="Migrations\202503310259360_finalupdatev4.Designer.cs">
+      <DependentUpon>202503310259360_finalupdatev4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503311633073_finalupdatev5.cs" />
+    <Compile Include="Migrations\202503311633073_finalupdatev5.Designer.cs">
+      <DependentUpon>202503311633073_finalupdatev5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202503311720042_finalupdatev6.cs" />
+    <Compile Include="Migrations\202503311720042_finalupdatev6.Designer.cs">
+      <DependentUpon>202503311720042_finalupdatev6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202504010300254_finalupdatev7.cs" />
+    <Compile Include="Migrations\202504010300254_finalupdatev7.Designer.cs">
+      <DependentUpon>202504010300254_finalupdatev7.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Auth\ApplicationRoleManager.cs" />
@@ -264,6 +283,8 @@
     <Compile Include="Models\Data\Department.cs" />
     <Compile Include="Models\Data\Interview.cs" />
     <Compile Include="Models\Data\Vacancy.cs" />
+    <Compile Include="Models\Enum\ApplicantStatusEnum.cs" />
+    <Compile Include="Models\Enum\InterviewStatusEnum.cs" />
     <Compile Include="Models\Log\LogEntry.cs" />
     <Compile Include="Models\ViewModels\ApplicantViewModel.cs" />
     <Compile Include="Models\ViewModels\Interviewer.cs" />
@@ -319,7 +340,6 @@
     <Content Include="Scripts\bootstrap.bundle.js.map" />
     <Content Include="Views\Default\Unauthorized.cshtml" />
     <Content Include="Views\Admin\UserInfo.cshtml" />
-    <Content Include="Views\HRGroup\Index.cshtml" />
     <Content Include="Views\Admin\LogReview.cshtml" />
     <Content Include="Views\Default\DatabaseConnectError.cshtml" />
     <Content Include="Views\Shared\_DefaultLayoutPage.cshtml" />
@@ -344,11 +364,16 @@
     <Content Include="Views\InterviewSchedule\Details.cshtml" />
     <Content Include="Views\InterviewSchedule\Edit.cshtml" />
     <Content Include="Views\InterviewSchedule\Index.cshtml" />
-    <Content Include="Views\Shared\_CreateInterview.cshtml" />
-    <Content Include="Views\Shared\_ScheduleLayout.cshtml" />
     <Content Include="Views\VacancySchedule\Applicants.cshtml" />
     <Content Include="Views\VacancySchedule\Details.cshtml" />
     <Content Include="Views\VacancySchedule\Index.cshtml" />
+    <Content Include="Views\ApplicantInterview\Index.cshtml" />
+    <Content Include="Views\Interview\Index.cshtml" />
+    <Content Include="Views\InterviewResult\Index.cshtml" />
+    <Content Include="Views\Shared\_InterviewLayout.cshtml" />
+    <Content Include="Views\VacancyInterview\Index.cshtml" />
+    <Content Include="Views\Account\ViewProfile.cshtml" />
+    <Content Include="Views\VacancySchedule\InterviewDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -372,6 +397,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503301638460_finalupdatev3.resx">
       <DependentUpon>202503301638460_finalupdatev3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503310259360_finalupdatev4.resx">
+      <DependentUpon>202503310259360_finalupdatev4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503311633073_finalupdatev5.resx">
+      <DependentUpon>202503311633073_finalupdatev5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202503311720042_finalupdatev6.resx">
+      <DependentUpon>202503311720042_finalupdatev6.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504010300254_finalupdatev7.resx">
+      <DependentUpon>202504010300254_finalupdatev7.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
@@ -404,10 +441,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
-    <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.5.1\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.5.1\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('packages\EntityFramework.6.5.1\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.5.1\build\EntityFramework.targets'))" />
   </Target>
-  <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="packages\EntityFramework.6.5.1\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.5.1\build\EntityFramework.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

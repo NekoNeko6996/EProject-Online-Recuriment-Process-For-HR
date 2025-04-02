@@ -69,10 +69,13 @@ else
                 <div class="list-group bg-white">
                     <a href="#" class="list-group-item border-0 border-radius-0 list-group-item-action active" id="btnProfile" onclick="showSection('profileSection')">Profile Info</a>
                     <a href="#" class="list-group-item border-0 border-radius-0 list-group-item-action" id="btnPassword" onclick="showSection('passwordSection')">Change Password</a>
-                    @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { onsubmit = "return confirm('Are you sure you want to Logout your account? This action cannot be undone.')", @class = "mt-3" }))
+                    @if (id == null)
                     {
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="list-group-item list-group-item-action list-group-item-danger">Logout Account</button>
+                        using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { onsubmit = "return confirm('Are you sure you want to Logout your account? This action cannot be undone.')", @class = "mt-3" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="list-group-item list-group-item-action list-group-item-danger">Logout Account</button>
+                        }
                     }
                 </div>
             </div>

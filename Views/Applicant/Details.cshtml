@@ -31,11 +31,13 @@
                     <p><strong>@Html.DisplayNameFor(model => model.CreatedAt):</strong> @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
                     <p>
                         <strong>@Html.DisplayNameFor(model => model.Status):</strong>
-                        <span class="badge bg-@(
-                            Model.Status?.ToLower() == "not in process" ? "secondary" :
-                            Model.Status?.ToLower() == "in process" ? "primary" :
-                            Model.Status?.ToLower() == "hired" ? "success" :
-                            Model.Status?.ToLower() == "banned" ? "danger" : "dark")">
+                        <span class="badge p-2
+                              @(Model.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                Model.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                Model.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                Model.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                Model.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                "bg-secondary")">
                             @Html.DisplayFor(model => model.Status)
                         </span>
                     </p>
@@ -62,7 +64,15 @@
         </div>
         <div class="card-footer text-center">
             @Html.ActionLink("Edit", "Edit", new { id = Model.ApplicantId }, new { @class = "btn btn-warning mx-2" })
-            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+            @* check if url exits returnurl *@
+            @if (Request.QueryString["returnurl"] != null)
+            {
+                <a href="@Request.QueryString["returnurl"]" class="btn btn-primary mx-2">Back</a>
+            }
+            else
+            {
+                @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+            }
         </div>
     </div>
 </div>

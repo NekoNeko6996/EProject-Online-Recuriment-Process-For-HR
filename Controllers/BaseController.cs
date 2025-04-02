@@ -23,7 +23,7 @@ public class BaseController : Controller
                 ViewBag.Page = "Index";
                 break;
             case "interviewer":
-                ViewBag.Controller = "Interview";
+                ViewBag.Controller = "ApplicantInterview";
                 ViewBag.Page = "Index";
                 break;
             default:

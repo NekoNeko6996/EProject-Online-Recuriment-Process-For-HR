@@ -1,7 +1,8 @@
-﻿@model IEnumerable<Sem3EProjectOnlineCPFH.Models.Data.Interview>
+﻿@using Sem3EProjectOnlineCPFH.Models.Enum
+@model IEnumerable<Sem3EProjectOnlineCPFH.Models.Data.Interview>
 
 @{
-    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Interview List";
 }
 
@@ -48,8 +49,8 @@
                         <td>@interview.StartTime.ToString(@"hh\:mm") - @interview.EndTime.ToString(@"hh\:mm")</td>
                         <td>
                             <span class="badge
-                                @(interview.Status == "Scheduled" ? "bg-warning text-dark" :
-                                interview.Status == "Completed" ? "bg-success" : "bg-danger")">
+                                @(interview.Status == InterviewStatus.Scheduled ? "bg-warning text-dark" :
+                                interview.Status == InterviewStatus.Completed ? "bg-success" : "bg-danger")">
                                 @interview.Status
                             </span>
                         </td>

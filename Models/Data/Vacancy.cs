@@ -13,16 +13,23 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string VacancyId { get; set; }
-
         public string OwnerId { get; set; }
 
         [Required, MaxLength(100)]
         public string Title { get; set; }
 
         public string Description { get; set; }
+
+        [Required]
         public string DepartmentId { get; set; }
+
+        [Required, MaxLength(100)]
         public string Status { get; set; }
+
+        [Required]
         public int NumberOfPositions { get; set; }
+
+        [Required]
         public DateTime Deadline { get; set; }
         public int ApplicationLimit { get; set; }
         public DateTime CreatedAt { get; set; }

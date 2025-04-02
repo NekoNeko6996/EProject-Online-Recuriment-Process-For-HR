@@ -9,6 +9,22 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Vacancy List</h2>
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <!-- Thanh tìm kiếm và nút tạo mới căn hai bên -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary" })
@@ -16,7 +32,7 @@
         @using (Html.BeginForm("Index", "Vacancy", FormMethod.Get, new { @class = "form-inline d-flex" }))
         {
             @Html.TextBox("search", ViewBag.Search as string, new { @class = "form-control me-2", placeholder = "Search by title or department..." })
-            <button type="submit" class="btn btn-info">Search</button>  
+            <button type="submit" class="btn btn-info">Search</button>
         }
     </div>
 
@@ -59,16 +75,21 @@
                             <a href="@Url.Action("Details", new { id = item.VacancyId })" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-eye"></i> Details
                             </a>
-                            <div>
+                            <div class="d-flex flex-row gap-1">
                                 @if (item.Status != "Closed")
                                 {
                                     <a href="@Url.Action("Edit", new { id = item.VacancyId })" class="btn btn-outline-warning btn-sm">
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </a>
                                 }
-                                <button onclick="confirmDelete('@item.VacancyId')" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
+                                @using (Html.BeginForm("DeleteConfirmed", "Vacancy", FormMethod.Post, new { @Class = "deletevacancy-" + @item.VacancyId }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", item.VacancyId)
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@item.VacancyId', '@item.Title')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -102,23 +123,19 @@
 </div>
 
 <script>
-    function confirmDelete(vacancyId) {
-        if (confirm("Are you sure you want to delete this vacancy?")) {
-            fetch(`@Url.Action("DeleteConfirmed", "Vacancy")?id=${vacancyId}`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    alert("Error deleting vacancy.");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+    function confirmDelete(vid, vname) {
+        showAlert('Warning',
+            [
+                "Are you sure you want to DELETE this Vacancy?",
+                "<strong style='color: red; text-decoration: underline;'>Be Careful!</strong>",
+                "<strong style='color: red; text-decoration: underline;'>This action will delete all information of tables related to this vacancy!</strong>",
+                "UID: " + vid,
+                "Vacancy Title: [" + vname + "]"
+            ],
+            "Confirm",
+            function () {
+                document.querySelector('.deletevacancy-' + vid).submit();
+            }
+        );
     }
 </script>

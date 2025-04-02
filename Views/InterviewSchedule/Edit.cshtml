@@ -1,73 +1,137 @@
 ﻿@model Sem3EProjectOnlineCPFH.Models.Data.Interview
 
 @{
-    Layout = "~/Views/Shared/_ScheduleLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Edit Interview";
+    string VID = Request.QueryString["VID"];
 }
 
 <div class="container mt-4">
-    <h2 class="text-primary text-center">Edit Interview</h2>
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger text-center">
-            @TempData["ErrorMessage"]
+    <div class="card shadow">
+        <div class="card-header">
+            <h2>Edit Interview</h2>
         </div>
-    }
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success text-center">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
-    @using (Html.BeginForm("Edit", "Interview", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.InterviewId)
-
-        <div class="form-group">
-            <label>Applicant</label>
-            @Html.EditorFor(model => model.ApplicantId, new { htmlAttributes = new { @class = "form-control" } })
-        </div>
-
-        <div class="form-group">
-            <label>Position</label>
-            @Html.EditorFor(model => model.VacancyId, new { htmlAttributes = new { @class = "form-control" } })
-        </div>
-
-        <div class="form-group">
-            <label>Interviewer</label>
-            @Html.EditorFor(model => model.InterviewerId, new { htmlAttributes = new { @class = "form-control" } })
-        </div>
-
-        <div class="form-group">
-            <label>Scheduled Date</label>
-            @Html.EditorFor(model => model.ScheduledDate, new { htmlAttributes = new { @class = "form-control", type = "date" } })
-        </div>
-
-        <div class="form-group">
-            <label>Start Time</label>
-            @Html.EditorFor(model => model.StartTime, new { htmlAttributes = new { @class = "form-control", type = "time" } })
-        </div>
-
-        <div class="form-group">
-            <label>End Time</label>
-            @Html.EditorFor(model => model.EndTime, new { htmlAttributes = new { @class = "form-control", type = "time" } })
-        </div>
-
-        <div class="form-group">
-            <label>Status</label>
-            @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
             {
-                new { Value = "Scheduled", Text = "Scheduled" },
-                new { Value = "Completed", Text = "Completed" },
-                new { Value = "Cancelled", Text = "Cancelled" }
-            }, "Value", "Text"), "Select Status", new { @class = "form-control" })
-        </div>
+                <div class="alert alert-danger text-center">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
 
-        <button type="submit" class="btn btn-primary mt-3">Save</button>
-        <a href="@Url.Action("Index", "Interview")" class="btn btn-secondary mt-3">Cancel</a>
-    }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success text-center">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @using (Html.BeginForm("Edit", "InterviewSchedule", FormMethod.Post, new { @class = "needs-validation", novalidate = "true" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.InterviewId)
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Applicant</label>
+                            @Html.EditorFor(model => model.ApplicantId, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                            @Html.ValidationMessageFor(model => model.ApplicantId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Position</label>
+                            @Html.EditorFor(model => model.VacancyId, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                            @Html.ValidationMessageFor(model => model.VacancyId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Interviewer</label>
+                            @Html.EditorFor(model => model.InterviewerId, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                            @Html.ValidationMessageFor(model => model.InterviewerId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Scheduled Date</label>
+                            @Html.EditorFor(model => model.ScheduledDate, new { htmlAttributes = new { @class = "form-control", type = "date", required = "required" } })
+                            @Html.ValidationMessageFor(model => model.ScheduledDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Start Time</label>
+                            @Html.EditorFor(model => model.StartTime, new { htmlAttributes = new { @class = "form-control", type = "time", required = "required" } })
+                            @Html.ValidationMessageFor(model => model.StartTime, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">End Time</label>
+                            @Html.EditorFor(model => model.EndTime, new { htmlAttributes = new { @class = "form-control", type = "time", required = "required" } })
+                            @Html.ValidationMessageFor(model => model.EndTime, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Interview Method</label>
+                            @Html.DropDownListFor(model => model.InterviewMethod, new SelectList(new[]
+                            {
+                                new { Value = "Online", Text = "Online" },
+                                new { Value = "Offline", Text = "Offline" }
+                            }, "Value", "Text"), new { @class = "form-select", required = "required", id = "InterviewMethod" })
+                            @Html.ValidationMessageFor(model => model.InterviewMethod, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6" id="InterviewURLContainer" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Interview URL</label>
+                            @Html.TextBoxFor(model => model.InterviewURL, new { @class = "form-control", id = "InterviewURL" })
+                            @Html.ValidationMessageFor(model => model.InterviewURL, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+                            {
+                                new { Value = "Scheduled", Text = "Scheduled" },
+                                new { Value = "Completed", Text = "Completed" },
+                                new { Value = "Cancelled", Text = "Cancelled" }
+                            }, "Value", "Text"), new { @class = "form-select", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                    <a href="@Url.Action("Details", "VacancySchedule", new { id = VID })" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+                </div>
+            }
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function toggleInterviewURL() {
+            var method = document.getElementById("InterviewMethod").value;
+            var urlContainer = document.getElementById("InterviewURLContainer");
+            urlContainer.style.display = method === "Online" ? "block" : "none";
+        }
+
+        document.getElementById("InterviewMethod").addEventListener("change", toggleInterviewURL);
+        toggleInterviewURL();
+
+        document.querySelector("form").addEventListener("submit", function (e) {
+            var startTime = document.querySelector("[name='StartTime']").value;
+            var endTime = document.querySelector("[name='EndTime']").value;
+            if (endTime <= startTime) {
+                e.preventDefault();
+                alert("End time must be greater than start time.");
+            }
+        });
+    });
+</script>

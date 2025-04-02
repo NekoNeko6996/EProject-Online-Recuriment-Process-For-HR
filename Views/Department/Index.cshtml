@@ -9,6 +9,22 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Department List</h2>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <p class="m-0">@TempData["SuccessMessage"]</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <p class="m-0">@TempData["ErrorMessage"]</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <!-- Thanh công cụ chứa nút Create và ô tìm kiếm -->
     <div class="d-flex justify-content-between mb-3">
         <!-- Nút Create nằm bên trái -->
@@ -25,7 +41,7 @@
         @foreach (var item in Model)
         {
             <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
-                <div class="card shadow-sm border-0">
+                <div class="card border">
                     <div class="card-body">
                         <h5 class="card-title">@item.DepartmentId</h5>
                         <hr />
@@ -35,9 +51,17 @@
                             <a href="@Url.Action("Edit", new { id = item.DepartmentId })" class="btn btn-outline-warning btn-sm">
                                 <i class="bi bi-pencil-square"></i> Edit
                             </a>
-                            <a href="@Url.Action("Delete", new { id = item.DepartmentId })" class="btn btn-outline-danger btn-sm">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
+                            @using (Html.BeginForm("Delete", "Department", FormMethod.Post, new { id = "deletedepartment-" + item.DepartmentId }))
+                            {
+                                @Html.Hidden("DepartmentId", item.DepartmentId)
+                                @Html.AntiForgeryToken()
+                                <div class="">
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            onclick="confirmDelete('@item.DepartmentId', '@item.DepartmentName')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -65,11 +89,18 @@
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".card").forEach(card => {
-                card.addEventListener("mouseenter", () => card.classList.add("shadow-lg"));
-                card.addEventListener("mouseleave", () => card.classList.remove("shadow-lg"));
-            });
-        });
+        function confirmDelete(did, dname) {
+            showAlert('Warning',
+                [
+                    "Are you sure you want to DELETE this Department?",
+                    "UID: " + did,
+                    "Department Name: [" + dname + "]"
+                ],
+                "Confirm",
+                function () {
+                    document.getElementById("deletedepartment-" + did).submit();
+                }
+            );
+        }
     </script>
 }

@@ -4,85 +4,76 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Edit Vacancy";
     bool isClosed = Model.Status == "Closed"; // Kiểm tra trạng thái của Vacancy
-}
+}   
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Edit Vacancy</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
 
-<h2>Edit Vacancy</h2>
+                @Html.HiddenFor(model => model.VacancyId)
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Title, new { @class = "form-label fw-bold" })
+                    @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "Enter vacancy title" })
+                    @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                </div>
 
-    <div class="form-horizontal">
-        <h4>Vacancy Details</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Description, new { @class = "form-label fw-bold" })
+                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4, placeholder = "Enter job description" })
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                </div>
 
-        @Html.HiddenFor(model => model.VacancyId)
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.NumberOfPositions, new { @class = "form-label fw-bold" })
+                    @Html.TextBoxFor(model => model.NumberOfPositions, new { @class = "form-control", type = "number", min = "1" })
+                    @Html.ValidationMessageFor(model => model.NumberOfPositions, "", new { @class = "text-danger" })
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Title, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "Enter vacancy title" })
-                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
-            </div>
-        </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.DepartmentId, "Department", new { @class = "form-label fw-bold" })
+                    @Html.DropDownListFor(model => model.DepartmentId,
+                        ViewBag.Departments as SelectList,
+                        new { @class = "form-select select2" })
+                    @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Description, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 4, placeholder = "Enter job description" })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-            </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.NumberOfPositions, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.NumberOfPositions, new { @class = "form-control", type = "number", min = "1", placeholder = "Enter number of positions" })
-                @Html.ValidationMessageFor(model => model.NumberOfPositions, "", new { @class = "text-danger" })
-            </div>
-        </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.CreatedAt, new { @class = "form-label fw-bold" })
+                    @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date", Value = Model.CreatedAt.ToString("yyyy-MM-dd"), @readonly = "readonly" })
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.DepartmentId, "Department", new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.DepartmentId, ViewBag.Departments as SelectList, "Select Department", new { @class = "form-control select2" })
-                @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
-            </div>
-        </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Status, new { @class = "form-label fw-bold" })
+                    @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+                    {
+                        new { Value = "Open", Text = "Open" },
+                        new { Value = "Closed", Text = "Closed" },
+                        new { Value = "Suspended", Text = "Suspended" }
+                    }, "Value", "Text", Model.Status), "Select Status", new { @class = "form-select" })
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreatedAt, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date", Value = Model.CreatedAt.ToString("yyyy-MM-dd"), @readonly = "readonly" })
-                @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
-            </div>
-        </div>
+                <div class="alert alert-danger">
+                    <p class="m-0">Be careful when changing the status to [Close], it cannot be undone.</p>
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Status, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.Status, new SelectList(new[]
-                {
-                    new { Value = "Open", Text = "Open" },
-                    new { Value = "Closed", Text = "Closed" },
-                    new { Value = "Suspended", Text = "Suspended" }
-                }, "Value", "Text", Model.Status), "Select Status", new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                @if (!isClosed)
-                {
-                    <button type="submit" class="btn btn-primary">Save</button>
-                }
-                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" })
-            </div>
+                <div class="text-center">
+                    @if (!isClosed)
+                    {
+                        <button type="submit" class="btn btn-primary px-4 me-2">Save</button>
+                    }
+                    @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary px-4" })
+                </div>
+            }
         </div>
     </div>
-}
+</div>
+
 
 @section Scripts {
     <script src="~/Scripts/jquery.validate.min.js"></script>

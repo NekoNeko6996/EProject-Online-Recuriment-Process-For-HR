@@ -3,102 +3,117 @@ using System.Linq;
 using System.Web.Mvc;
 using Sem3EProjectOnlineCPFH.Models;
 using Sem3EProjectOnlineCPFH.Models.ViewModels;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 using System.Data.Entity;
 using System.Collections.Generic;
 using Sem3EProjectOnlineCPFH.Models.Data;
 
-public class VacancyScheduleController : Controller
+namespace Sem3EProjectOnlineCPFH.Controllers
 {
-    private readonly ApplicationDbContext _context = new ApplicationDbContext();
-
-    // Danh sách Vacancy
-    public ActionResult Index()
+    [Authorize(Roles = "hrgroup")]
+    public class VacancyScheduleController : BaseController
     {
-        var vacancies = _context.Vacancies
-            .Where(v => v.Status == "Open" && v.ApplicantVacancies.Count() > 0)
-            .ToList();
+        private readonly ApplicationDbContext _context = new ApplicationDbContext();
 
-        return View(vacancies);
-    }
-
-    // Danh sách Applicants theo VacancyId
-    public ActionResult Applicants(string id)
-    {
-        if (string.IsNullOrEmpty(id))
+        // Danh sách Vacancy
+        public ActionResult Index()
         {
-            return RedirectToAction("Index", "Vacancy");
+            var vacancies = _context.Vacancies
+                .Where(v => v.Status == "Open" && v.ApplicantVacancies.Count() > 0)
+                .ToList();
+
+            return View(vacancies.OrderByDescending(v => v.CreatedAt));
         }
 
-        var vacancy = _context.Vacancies.Find(id);
-        if (vacancy == null)
+        // Danh sách Applicants theo VacancyId
+        public ActionResult Applicants(string id)
         {
-            return HttpNotFound("Vacancy not found!");
-        }
-
-        var interviews = _context.Interviews
-            .Where(i => i.VacancyId == id)
-            .Select(i => new InterviewViewModel
+            if (string.IsNullOrEmpty(id))
             {
-                Id = i.InterviewId,
-                ApplicantId = i.ApplicantId,
-                InterviewerId = i.InterviewerId,
-                ScheduledDate = i.ScheduledDate,
-                StartTime = i.StartTime,
-                EndTime = i.EndTime,
-                Status = i.Status
-            }).ToList();
+                return RedirectToAction("Index", "Vacancy");
+            }
 
-        ViewBag.VacancyTitle = vacancy.Title;
-        return View(interviews);
-    }
-
-    public ActionResult Details(string id)
-    {
-        if (string.IsNullOrEmpty(id))
-        {
-            return HttpNotFound("Vacancy ID is missing!");
-        }
-
-        var vacancy = _context.Vacancies
-            .AsNoTracking()
-            .Include(v => v.ApplicantVacancies.Select(av => av.Applicant)) // Load Applicants qua ApplicantVacancy
-            .FirstOrDefault(v => v.VacancyId == id);
-
-        if (vacancy == null)
-        {
-            return HttpNotFound("Vacancy not found!");
-        }
-
-        // Lấy danh sách Applicants từ ApplicantVacancies
-        var applicants = vacancy.ApplicantVacancies
-            ?.Select(av => av.Applicant)
-            .ToList() ?? new List<Applicant>();
-
-        var interviews = _context.Interviews
-            .Where(i => i.VacancyId == id)
-            .Select(i => new InterviewViewModel
+            var vacancy = _context.Vacancies.Find(id);
+            if (vacancy == null)
             {
-                Id = i.InterviewId,
-                ApplicantId = i.ApplicantId,
-                ApplicantName = i.Applicant.FullName, // Lấy tên ứng viên
-                InterviewerId = i.InterviewerId,
-                InterviewerName = String.Concat(i.Interviewer.LastName, " ", i.Interviewer.FirstName) , // Lấy tên Interviewer
-                ScheduledDate = i.ScheduledDate,
-                StartTime = i.StartTime,
-                EndTime = i.EndTime,
-                InterviewMethod = i.InterviewMethod,
-                MeetUrl = i.InterviewURL,
-                Status = i.Status
-            }).ToList();
+                return HttpNotFound("Vacancy not found!");
+            }
 
-        var viewModel = new VacancyViewModel
+            var interviews = _context.Interviews
+                .Where(i => i.VacancyId == id)
+                .Select(i => new InterviewViewModel
+                {
+                    Id = i.InterviewId,
+                    ApplicantId = i.ApplicantId,
+                    InterviewerId = i.InterviewerId,
+                    ScheduledDate = i.ScheduledDate,
+                    StartTime = i.StartTime,
+                    EndTime = i.EndTime,
+                    Status = i.Status
+                }).ToList();
+
+            ViewBag.VacancyTitle = vacancy.Title;
+            return View(interviews);
+        }
+
+        public ActionResult Details(string id)
         {
-            Vacancy = vacancy,
-            Applicants = applicants, // Gán danh sách ứng viên vào ViewModel
-            Interviews = interviews // Chưa có bảng Interview nên để rỗng
-        };
+            if (string.IsNullOrEmpty(id))
+            {
+                return HttpNotFound("Vacancy ID is missing!");
+            }
+
+            var vacancy = _context.Vacancies
+                .AsNoTracking()
+                .Include(v => v.ApplicantVacancies.Select(av => av.Applicant)) // Load Applicants qua ApplicantVacancy
+                .FirstOrDefault(v => v.VacancyId == id);
+
+            if (vacancy == null)
+            {
+                return HttpNotFound("Vacancy not found!");
+            }
+
+            // Lấy danh sách Applicants từ ApplicantVacancies
+            var applicants = vacancy.ApplicantVacancies
+                ?.Select(av => av.Applicant)
+                .ToList() ?? new List<Applicant>();
+
+            var interviews = _context.Interviews
+                .Where(i => i.VacancyId == id)
+                .Select(i => new InterviewViewModel
+                {
+                    Id = i.InterviewId,
+                    ApplicantId = i.ApplicantId,
+                    ApplicantName = i.Applicant.FullName, // Lấy tên ứng viên
+                    InterviewerId = i.InterviewerId,
+                    InterviewerName = String.Concat(i.Interviewer.LastName, " ", i.Interviewer.FirstName), // Lấy tên Interviewer
+                    ScheduledDate = i.ScheduledDate,
+                    StartTime = i.StartTime,
+                    EndTime = i.EndTime,
+                    InterviewMethod = i.InterviewMethod,
+                    MeetUrl = i.InterviewURL,
+                    Status = i.Status
+                }).ToList();
+
+            var viewModel = new VacancyViewModel
+            {
+                Vacancy = vacancy,
+                Applicants = applicants, // Gán danh sách ứng viên vào ViewModel
+                Interviews = interviews // Chưa có bảng Interview nên để rỗng
+            };
 
 
-        return View(viewModel);
+            return View(viewModel);
+        }
+
+        public ActionResult InterviewDetails(string id)
+        {
+            var interview = _context.Interviews.Find(id);
+            if (interview == null)
+            {
+                return HttpNotFound();
+            }
+            return View(interview);
+        }
     }
 }

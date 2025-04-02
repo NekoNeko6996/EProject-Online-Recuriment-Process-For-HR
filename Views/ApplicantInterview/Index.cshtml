@@ -1,0 +1,212 @@
+﻿@model IPagedList<Sem3EProjectOnlineCPFH.Models.Data.Applicant>
+
+@using Sem3EProjectOnlineCPFH.Models.Enum;
+@using PagedList.Mvc;
+@using PagedList;
+
+@{
+    Layout = "~/Views/Shared/_InterviewLayout.cshtml";
+    ViewBag.Title = "Candidate List";
+}
+
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+
+<div class="search-panel border rounded-3 p-3 mb-4 mt-4" style="border-color: #0D6EFD !important;">
+    @using (Html.BeginForm("Index", "ApplicantInterview", FormMethod.Get))
+    {
+        <div class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <input type="text" name="searchName" class="form-control"
+                       placeholder="Search by Applicant name"
+                       value="@Request.QueryString["searchName"]">
+                <input type="hidden" name="vacancyId" value="@Request.QueryString["vacancyId"]" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+            </div>
+            <div class="col-md-2 d-grid">
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    }
+</div>
+
+@if (ViewBag.Vacancy != null)
+{
+    <div class="vacancy-details card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Vacancy Information</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Title:</strong> @ViewBag.Vacancy.Title</p>
+                    <p><strong>Department:</strong> @(ViewBag.Vacancy.Department.DepartmentName ?? "N/A")</p>
+                    <p><strong>Status:</strong> @ViewBag.Vacancy.Status</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Openings:</strong> @ViewBag.Vacancy.NumberOfPositions</p>
+                    <p><strong>Deadline:</strong> @(ViewBag.Vacancy.Deadline?.ToString("dd/MM/yyyy") ?? "N/A")</p>
+                    <p><strong>Application Limit:</strong> @ViewBag.Vacancy.ApplicationLimit</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row mt-3 g-3 align-items-center">
+    <div class="col-md-6">
+        <div class="stats-display">
+            <span>Total <strong>@ViewBag.Scheduled</strong> applicants</span>
+        </div>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-1">
+    @foreach (var candidate in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm bg-white rounded-3 border border-2 border-light hover-card border">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title fw-bold mb-0 text-dark">@candidate.FullName</h5>
+                        <span class="badge @(candidate.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                candidate.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                candidate.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                candidate.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                candidate.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                "bg-secondary")">
+                            @candidate.Status
+                        </span>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">ID:</small>
+                        <div class="text-dark">@candidate.ApplicantId</div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Email:</small>
+                        <div class="text-dark">@candidate.Email</div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Phone number:</small>
+                        <div class="text-dark">@(candidate.PhoneNumber ?? "N/A")</div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Application date:</small>
+                        <div class="text-dark">@(candidate.CreatedAt.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                    </div>
+
+                    @if (candidate.ApplicantVacancies != null && candidate.ApplicantVacancies.Any())
+                    {
+                        <div class="mb-2">
+                            <small class="text-muted">Applied positions:</small>
+                            <div class="text-dark">
+                                @foreach (var application in candidate.ApplicantVacancies.Take(2))
+                                {
+                                    <div>@(application.Vacancy?.Title ?? "N/A")</div>
+                                }
+                                @if (candidate.ApplicantVacancies.Count > 2)
+                                {
+                                    <div class="text-muted">+ @(candidate.ApplicantVacancies.Count - 2) other positions</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                        <a href="@Url.Action("Index", "Interview", new { applicantId = candidate.ApplicantId })"
+                           class="btn btn-sm btn-primary me-md-2">
+                            <i class="bi bi-person-lines-fill"></i> View interview
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="mt-4">
+    <ul class="pagination">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            searchName = Request.QueryString["searchName"],
+            status = Request.QueryString["status"],
+            vacancyId = Request.QueryString["vacancyId"]
+        }))
+    </ul>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4">
+        <i class="bi bi-info-circle"></i> No candidates found matching the search criteria.
+    </div>
+}
+
+<style>
+    .hover-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .vacancy-details {
+        background-color: #f8f9fa;
+        border-left: 4px solid #0d6efd;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+    }
+
+        .pagination > li {
+            display: inline-block;
+        }
+
+            .pagination > li > a,
+            .pagination > li > span {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border: 1px solid #0D6EFD !important;
+                border-radius: 50% !important;
+                color: #000 !important;
+                text-decoration: none !important;
+                font-size: 14px;
+                background-color: white;
+                transition: all 0.2s ease;
+            }
+
+                .pagination > li > a:hover {
+                    background-color: #0D6EFD !important;
+                    color: white !important;
+                    transform: translateY(-3px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+        .pagination > .active > a,
+        .pagination > .active > span {
+            background-color: #0D6EFD !important;
+            color: white !important;
+            border-color: #0D6EFD !important;
+        }
+
+        .pagination > .disabled > span {
+            color: #6c757d !important;
+            border-color: #dee2e6 !important;
+            background-color: white !important;
+        }
+
+
+        .pagination > li.PagedList-skipToPrevious,
+        .pagination > li.PagedList-skipToNext {
+            display: none !important;
+        }
+</style>
