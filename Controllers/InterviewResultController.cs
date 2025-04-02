@@ -20,6 +20,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
         public ActionResult Index(string resultType, string searchName, string searchDepartment, string searchPosition, int? page)
         {
+
             int pageSize = 10;
             int pageNumber = (page ?? 1);
 

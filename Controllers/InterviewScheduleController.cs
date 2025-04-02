@@ -107,9 +107,33 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             ViewBag.VID = interview.VacancyId;
             ViewBag.AID = interview.ApplicantId;
 
+            List<Interviewer> interviewer = db.Users.Where(u => u.Roles.Any(r => r.RoleId == "3"))
+                .Select(u => new Interviewer
+                {
+                    InterviewerId = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    Phone = u.PhoneNumber
+                }).ToList();
+
+            ViewBag.Interviewers = interviewer;
+
             if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Invalid data. Please check your input!";
+                return View(interview);
+            }
+
+            if(interview.ScheduledDate < DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "Scheduled Date must be in the future!";
+                return View(interview);
+            }
+
+            if(interview.InterviewMethod == "Online" && string.IsNullOrEmpty(interview.InterviewURL))
+            {
+                TempData["ErrorMessage"] = "Interview URL is required for Online interviews!";
                 return View(interview);
             }
 

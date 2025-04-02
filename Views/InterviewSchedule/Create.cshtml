@@ -90,7 +90,7 @@
                         <div class="mb-3">
                             @Html.LabelFor(m => m.InterviewMethod, new { @class = "form-label fw-bold" })
                             @Html.DropDownListFor(m => m.InterviewMethod, new SelectList(new[]
-             {
+                            {
                                 new { Value = "Online", Text = "Online" },
                                 new { Value = "Offline", Text = "Offline" }
                             }, "Value", "Text"), "Select Method", new { @class = "form-select", id = "interviewMethodDropdown" })

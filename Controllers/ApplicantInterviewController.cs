@@ -32,7 +32,7 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             // Get all applicants me interview
             var applicants = _context.Interviews
-                .Where(i => i.InterviewerId == userId && i.Applicant.Status == ApplicantStatus.Scheduled)
+                .Where(i => i.InterviewerId == userId && i.Applicant.Status == ApplicantStatus.Scheduled && i.Status == InterviewStatus.Scheduled)
                 .Select(i => i.Applicant)
                 .AsQueryable();
 

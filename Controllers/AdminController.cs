@@ -228,12 +228,29 @@ namespace Sem3EProjectOnlineCPFH.Controllers
 
             ApplicationDbContext db = new ApplicationDbContext();
             var user = db.Users.Find(Id);
+            
             if (user == null)
             {
                 TempData["ErrorMessage"] = "User not found!";
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
             }
-            
+
+            // check if user is in Vacancy
+            var vacancy = db.Vacancies.FirstOrDefault(v => v.OwnerId == Id);
+            if (vacancy != null)
+            {
+                TempData["ErrorMessage"] = "User is in Vacancy!, can't delete.";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+
+            // check if user is in interview
+            var interview = db.Interviews.FirstOrDefault(i => i.InterviewerId == Id);
+            if (interview != null)
+            {
+                TempData["ErrorMessage"] = "User is in Interview!, can't delete.";
+                return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+
             try
             {
                 var userProfile = db.UserProfiles.Find(Id);
