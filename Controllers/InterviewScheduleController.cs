@@ -262,11 +262,12 @@ namespace Sem3EProjectOnlineCPFH.Controllers
         // POST: Interview/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Interview interview)
+        public async Task<ActionResult> Edit(Interview interview)
         {
+            string VID = interview.VacancyId;
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = string.Join("<br/>", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                TempData["ErrorMessage"] = "Invalid data. Please check your input!";
                 return View(interview);
             }
 
@@ -277,47 +278,96 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return RedirectToAction("Index");
             }
 
-            try
+            using (var transaction = db.Database.BeginTransaction())
             {
-                // Cập nhật thông tin từ form vào bản ghi trong database
-                existingInterview.ApplicantId = interview.ApplicantId;
-                existingInterview.VacancyId = interview.VacancyId;
-                existingInterview.InterviewerId = interview.InterviewerId;
-                existingInterview.ScheduledDate = interview.ScheduledDate;
-                existingInterview.StartTime = interview.StartTime;
-                existingInterview.EndTime = interview.EndTime;
-                existingInterview.Status = interview.Status;
-                existingInterview.InterviewMethod = interview.InterviewMethod;
-
-                // Nếu phương thức là Online, cập nhật URL
-                if (interview.InterviewMethod == "Online")
+                try
                 {
-                    existingInterview.InterviewURL = interview.InterviewURL;
+                    // Cập nhật thông tin phỏng vấn
+                    existingInterview.ApplicantId = interview.ApplicantId;
+                    existingInterview.VacancyId = interview.VacancyId;
+                    existingInterview.InterviewerId = interview.InterviewerId;
+                    existingInterview.ScheduledDate = interview.ScheduledDate;
+                    existingInterview.StartTime = interview.StartTime;
+                    existingInterview.EndTime = interview.EndTime;
+                    existingInterview.Status = interview.Status;
+                    existingInterview.InterviewMethod = interview.InterviewMethod;
+
+                    if (interview.InterviewMethod == "Online")
+                    {
+                        existingInterview.InterviewURL = interview.InterviewURL;
+                    }
+                    else
+                    {
+                        existingInterview.InterviewURL = null;
+                    }
+                    
+                    db.Entry(existingInterview).State = System.Data.Entity.EntityState.Modified;
+                    db.SaveChanges();
+
+                    // Lấy thông tin ứng viên
+                    var applicant = existingInterview.Applicant;
+                    System.Diagnostics.Debug.WriteLine(applicant.Email);
+                    if (applicant != null)
+                    {
+                        var email = new EmailService();
+                        string emailBody = $@"
+                            <html>
+                            <head>
+                                <style>
+                                    body {{ font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }}
+                                    .email-container {{ max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px #ccc; }}
+                                    .header {{ text-align: center; padding: 10px; background-color: #007bff; color: white; font-size: 20px; font-weight: bold; border-radius: 8px 8px 0 0; }}
+                                    .content {{ padding: 20px; line-height: 1.6; }}
+                                    .footer {{ text-align: center; font-size: 12px; color: gray; margin-top: 20px; }}
+                                    .button {{ display: inline-block; padding: 10px 15px; color: white; background-color: #28a745; text-decoration: none; border-radius: 5px; font-weight: bold; }}
+                                </style>
+                            </head>
+                            <body>
+                                <div class='email-container'>
+                                    <div class='header'>Updated Interview Schedule</div>
+                                    <div class='content'>
+                                        <p>Dear <b>{applicant.FullName}</b>,</p>
+                                        <p>Your interview details have been updated.</p>
+                                        <p><b>New Date:</b> {interview.ScheduledDate:dddd, MMMM d, yyyy}</p>
+                                        <p><b>Time:</b> {interview.StartTime} - {interview.EndTime}</p>
+                                        <p><b>Method:</b> {interview.InterviewMethod}</p>
+
+                                        {(interview.InterviewMethod == "Online"
+                                                    ? $"<p><b>Interview URL:</b> <a href='{interview.InterviewURL}' style='color: #0D6EFD;'>Join Meeting</a></p>"
+                                                    : "<p><b>Address:</b> 1st Ly Tu Trong, Ninh Kieu, Cantho City</p>")}
+
+                                        <p style='color: green;'><b>Note:</b> Please be prepared and join on time.</p>
+                                    </div>
+                                    <div class='footer'>
+                                        <p>Best Regards, <br>HR Team | Your Company</p>
+                                        <p>&copy; 2024 Your Company. All Rights Reserved.</p>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>";
+
+                        await email.SendEmailAsync(applicant.Email, "Updated Interview Schedule", emailBody);
+                    }
+
+                    transaction.Commit();
+                    TempData["SuccessMessage"] = "Interview updated successfully!";
+                    return RedirectToAction("Details", "VacancySchedule", new { id = VID });
                 }
-                else
+                catch (Exception e)
                 {
-                    // Xóa URL nếu chuyển sang Offline để tránh dữ liệu không cần thiết
-                    existingInterview.InterviewURL = null;
+                    System.Diagnostics.Debug.WriteLine("Error: " + e.Message);
+                    if (e.InnerException != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Inner Exception: " + e.InnerException.Message);
+                    }
+
+                    transaction.Rollback();
+                    TempData["ErrorMessage"] = "An error occurred while updating the interview. Please check logs for details.";
+                    return View(interview);
                 }
-
-                db.Entry(existingInterview).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-
-                TempData["SuccessMessage"] = "Interview updated successfully!";
-                return RedirectToAction("Index");
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                TempData["ErrorMessage"] = "Data was modified by another user. Please try again!";
-                return View(interview);
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                TempData["ErrorMessage"] = "An error occurred while updating the interview.";
-                return View(interview);
             }
         }
+
 
 
 
