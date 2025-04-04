@@ -16,10 +16,10 @@
             <div class="result-filter btn-group mb-4">
 
                 <a href="@Url.Action("Selected")" class="btn @(resultType == "Selected" ? "btn-primary" : "btn-outline-primary")">
-                    <i class="bi bi-check-circle"></i> Selected Candidates
+                    <i class="bi bi-check-circle"></i> Selected Applicants
                 </a>
                 <a href="@Url.Action("Rejected")" class="btn @(resultType == "Rejected" ? "btn-primary" : "btn-outline-primary")">
-                    <i class="bi bi-x-circle"></i> Rejected Candidates
+                    <i class="bi bi-x-circle"></i> Rejected Applicants
                 </a>
             </div>
             <div class="search-panel border rounded-3 p-3 mb-4" style="border-color: #0D6EFD !important;">
@@ -102,7 +102,7 @@
                 <div class="contact-panel" id="contact-panel-@interview.ApplicantId" style="display: none;">
                     <div class="contact-content card">
                         <div class="card-header bg-primary text-white">
-                            <h4 class="mb-0">Candidate Details</h4>
+                            <h4 class="mb-0">Applicant Details</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -129,7 +129,7 @@
                                     <div class="info-section">
                                         <h6><i class="bi bi-person-lines-fill"></i> Personal Information</h6>
                                         <div class="info-item">
-                                            <label>Candidate ID:</label>
+                                            <label>Applicant ID:</label>
                                             <span>@interview.ApplicantId</span>
                                         </div>
                                         <div class="info-item">
