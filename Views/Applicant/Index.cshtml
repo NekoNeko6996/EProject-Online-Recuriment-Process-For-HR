@@ -1,0 +1,125 @@
+﻿@model PagedList.IPagedList<Sem3EProjectOnlineCPFH.Models.Data.Applicant>
+@using PagedList.Mvc
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Applicant List";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Applicant List</h2>
+
+    <!-- Thanh tìm kiếm và nút tạo mới căn hai bên -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary" })
+
+        @using (Html.BeginForm("Index", "Applicant", FormMethod.Get, new { @class = "form-inline d-flex" }))
+        {
+            @Html.TextBox("search", ViewBag.Search as string, new { @class = "form-control me-2", placeholder = "Enter name, email or phone..." })
+            <button type="submit" class="btn btn-info">Search</button>
+        }
+    </div>
+
+    <!-- Hiển thị danh sách Applicant dưới dạng thẻ -->
+    @if (Model.Any())
+    {
+        <div class="row">
+            @{
+                int count = 0;
+            }
+
+            @foreach (var item in Model)
+            {
+                if (count % 3 == 0 && count != 0)
+                {
+                @:</div><div class="row">
+                }
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm position-relative">
+                        <!-- Badge Status góc trên phải với padding hợp lý -->
+                        <span class="position-absolute top-0 end-0 mt-2 me-2 px-3 py-1 rounded text-white
+                            @(item.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                item.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                item.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                item.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                item.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                "bg-secondary")">
+                            @item.Status
+                        </span>
+
+
+                        <div class="card-body">
+                            <!-- Hiển thị tên và cắt bớt nếu quá dài -->
+                            <h5 class="card-title text-truncate" style="max-width: 100%;" title="@item.FullName">
+                                @item.FullName
+                            </h5>
+                            <hr />
+                            <p class="card-text"><strong>Email:</strong> @item.Email</p>
+                            <p class="card-text"><strong>Phone:</strong> @item.PhoneNumber</p>
+                            <p class="card-text"><strong>Created:</strong> @item.CreatedAt.ToString("dd/MM/yyyy")</p>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between">
+                            <a href="@Url.Action("Details", new { id = item.ApplicantId })" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Details
+                            </a>
+                            <div class="d-flex flex-row gap-1">
+                                <a href="@Url.Action("Edit", new { id = item.ApplicantId })" class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+
+                                @using (Html.BeginForm("Delete", "Applicant", new { id = item.ApplicantId }, FormMethod.Post, new { id = "deleteapplicant-" + item.ApplicantId }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@item.ApplicantId', '@item.FullName')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                count++;
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No applicants found.</p>
+    }
+
+    <!-- Phân trang -->
+    <div class="d-flex flex-column align-items-center mt-3">
+        <div>
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+        </div>
+        <div class="mt-2">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, search = ViewBag.Search }),
+            new PagedListRenderOptions
+            {
+                Display = PagedListDisplayMode.IfNeeded,
+                MaximumPageNumbersToDisplay = 5,
+                ContainerDivClasses = new[] { "pagination-container", "d-flex", "justify-content-center" },
+                UlElementClasses = new[] { "pagination", "gap-2" } // Thêm class để tạo khoảng cách
+            })
+        </div>
+    </div>
+</div>
+
+@*  *@
+<script>
+    function confirmDelete(aid, aname) {
+        showAlert('Warning',
+            [
+                "Are you sure you want to DELETE this Applicant?",
+                "AID: " + aid,
+                "Applicant Name: [" + aname + "]"
+            ],
+            "Confirm",
+            function () {
+                document.getElementById("deleteapplicant-" + aid).submit();
+            }
+        );
+    }
+</script>

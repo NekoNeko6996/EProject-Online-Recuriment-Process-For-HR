@@ -1,0 +1,152 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Vacancy
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Create Vacancy";
+}
+
+@if (@TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <p class="m-0">@TempData["ErrorMessage"]</p>
+    </div>
+}
+
+<div class="d-flex justify-content-center align-items-center vh-90">
+    <div class="col-md-6">
+        <h3 class="text-center mb-4">Create Vacancy</h3>
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.Hidden("HasModelError", !ViewData.ModelState.IsValid)
+
+            <!-- Vacancy ID -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Vacancy ID</label>
+                <input type="text" class="form-control" value="@Model.VacancyId" readonly>
+                @Html.HiddenFor(model => model.VacancyId) <!-- Đảm bảo giữ ID khi load lại -->
+            </div>
+
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Title</label>
+                @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "Enter vacancy title", autofocus = "autofocus" })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 3, placeholder = "Enter job description" })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Number Of Positions -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Number Of Positions</label>
+                @Html.TextBoxFor(model => model.NumberOfPositions, new { @class = "form-control", type = "number", min = "1", placeholder = "Enter number of positions" })
+                @Html.ValidationMessageFor(model => model.NumberOfPositions, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Choose Department -->
+            <div class="mb-3 position-relative">
+                <label class="form-label fw-bold">Department Name</label>
+                <input type="text" id="departmentSearch" class="form-control" placeholder="Search department name"
+                       autocomplete="off">
+                @Html.HiddenFor(model => model.DepartmentId)
+                @Html.ValidationMessageFor(model => model.DepartmentId, "", new { @class = "text-danger" })
+                <ul id="departmentSuggestions" class="list-group mt-1 position-absolute w-100 bg-white border shadow-sm"
+                    style="z-index: 1000; display: none;"></ul>
+            </div>
+
+            <!-- Created Date -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Created Date</label>
+                @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date" })
+                @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Status -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Status</label>
+                @Html.DropDownListFor(model => model.Status, new SelectList(new[]
+                {
+                    new { Value = "Open", Text = "Open" },
+                    new { Value = "Suspended", Text = "Suspended" }
+                }, "Value", "Text"), "Select Status", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Buttons -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary px-4 me-2">Create</button>
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary px-4" })
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var departmentInput = $("#departmentSearch");
+            var suggestionsList = $("#departmentSuggestions");
+
+            // Lấy danh sách departments từ hidden input
+            var allDepartments = @Html.Raw(Json.Encode(ViewBag.Departments));
+
+            console.log(allDepartments);
+
+            // Hiển thị danh sách khi nhập
+            departmentInput.on("keyup", function () {
+                var searchText = $(this).val().toLowerCase();
+                suggestionsList.empty().hide();
+
+                if (searchText.length > 0) {
+                    var filtered = allDepartments.filter(d => d.DepartmentName.toLowerCase().includes(searchText));
+
+                    if (filtered.length > 0) {
+                        filtered.forEach(function (item) {
+                            suggestionsList.append('<li class="list-group-item list-group-item-action" data-id="' + item.DepartmentId + '">' + item.DepartmentName + '</li>');
+                        });
+                        suggestionsList.show();
+                    } else {
+                        suggestionsList.append('<li class="list-group-item text-muted">No results found</li>').show();
+                    }
+                }
+            });
+
+            // Khi chọn một department
+            $(document).on("click", "#departmentSuggestions li", function () {
+                if (!$(this).hasClass("text-muted")) {
+                    departmentInput.val($(this).text());
+                    $("#DepartmentId").val($(this).attr("data-id"));
+                }
+                suggestionsList.hide();
+            });
+
+            // Đóng danh sách khi click bên ngoài
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest("#departmentSearch, #departmentSuggestions").length) {
+                    suggestionsList.hide();
+                }
+            });
+
+            // Khi submit form, kiểm tra nếu không có giá trị hợp lệ thì báo lỗi
+            $("form").on("submit", function () {
+                if (!$("#DepartmentId").val()) {
+                    showAlert('Warning',
+                        [
+                            "Please select a department from the suggestions as you type.",
+                        ],
+                        "Cancel",
+                        () => { }
+                    );
+                    return false;
+                }
+            });
+        });
+    </script>
+}

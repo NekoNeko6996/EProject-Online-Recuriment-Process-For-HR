@@ -12,6 +12,7 @@ using System.Linq;
 using Sem3EProjectOnlineCPFH.Services;
 using System.Data.Entity;
 using Sem3EProjectOnlineCPFH.Models.User;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 
 namespace Sem3EProjectOnlineCPFH.Controllers
 {
@@ -498,6 +499,47 @@ namespace Sem3EProjectOnlineCPFH.Controllers
             {
                 TempData["SuccessMessage"] = $"Updated Avatar For User [{form.Id}] Successfully!";
                 return RedirectToAction(ViewBag.Page, ViewBag.Controller);
+            }
+        }
+
+        // GET: View Profile
+        public ActionResult ViewProfile(string id)
+        {
+            // Nếu không có id thì xem profile của chính mình
+            if (id == null)
+            {
+                id = User.Identity.GetUserId();
+            }
+
+            using (var db = new ApplicationDbContext())
+            {
+                var user = db.Users.Find(id);
+                if (user == null)
+                {
+                    return HttpNotFound();
+                }
+                var profile = new ProfileSettingsViewModel
+                {
+                    ProfileUpdate = new ProfileViewModel
+                    {
+                        AvatarUrl = user.UserProfile.AvatarUrl,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        Bio = user.UserProfile.Bio,
+                        PhoneNumber = user.PhoneNumber,
+                        SocialAccount1 = user.UserProfile.SocialAccount1,
+                        SocialAccount2 = user.UserProfile.SocialAccount2,
+                        SocialAccount3 = user.UserProfile.SocialAccount3,
+                        Id = id
+                    }
+                };
+
+                ViewBag.RoleName = UserManager.GetRoles(id).FirstOrDefault();
+                ViewBag.TotalInterviews = db.Interviews.Count(i => i.InterviewerId == id);
+                ViewBag.TotalPassed = db.Interviews.Count(i => i.InterviewerId == id && i.Applicant.Status == ApplicantStatus.HasPassed);
+                ViewBag.TotalFailed = db.Interviews.Count(i => i.InterviewerId == id && i.Applicant.Status == ApplicantStatus.Rejected);
+                return View(profile);
             }
         }
     }

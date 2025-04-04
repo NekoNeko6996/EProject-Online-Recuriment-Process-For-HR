@@ -20,38 +20,6 @@
         overflow-x: auto;
     }
 </style>
-<style>
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5); /* Làm mờ nền */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1050;
-    }
-
-    .spinner-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .spinner-border {
-        width: 4rem;
-        height: 4rem;
-    }
-
-    .loading-text {
-        margin-top: 10px;
-        color: white;
-        font-size: 1.2rem;
-        font-weight: bold;
-    }
-</style>
 
 <div class="container-fluid">
     <div>
@@ -323,28 +291,6 @@
     }
 </div>
 
-<!-- Loading Spinner -->
-<div id="loadingSpinner" style="display: none;">
-    <div class="loading-overlay">
-        <div class="spinner-container">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="loading-text">Loading, please wait...</p>
-        </div>
-    </div>
-</div>
-
-<!-- JS (Hiển thị Spinner) -->
-<script>
-    function showLoading() {
-        document.getElementById("loadingSpinner").style.display = "block";
-    }
-
-    function hideLoading() {
-        document.getElementById("loadingSpinner").style.display = "none";
-    }
-</script>
-
-
 <script>
     document.querySelectorAll("form").forEach(form => {
         form.addEventListener("submit", function () {
@@ -382,8 +328,6 @@
     });
 </script>
 
-
-@* // *@
 @{
     SearchQuery = null;
 }

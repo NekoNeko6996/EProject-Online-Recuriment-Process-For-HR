@@ -1,0 +1,20 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Interview
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Interview Details";
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary text-center">Interview Details</h2>
+    <table class="table table-bordered">
+        <tr><th>ID</th><td>@Model.InterviewId</td></tr>
+        <tr><th>Applicant ID</th><td>@Model.ApplicantId</td></tr>
+        <tr><th>Vacancy ID</th><td>@Model.VacancyId</td></tr>
+        <tr><th>Interviewer ID</th><td>@Model.InterviewerId</td></tr>
+        <tr><th>Date</th><td>@Model.ScheduledDate.ToString("dd/MM/yyyy")</td></tr>
+        <tr><th>Time</th><td>@Model.StartTime - @Model.EndTime</td></tr>
+        <tr><th>Status</th><td>@Model.Status</td></tr>
+    </table>
+    <a href="@Url.Action("Index", "Interview")" class="btn btn-secondary">Back</a>
+</div>

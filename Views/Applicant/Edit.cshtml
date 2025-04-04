@@ -1,0 +1,107 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Applicant
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Edit Applicant";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @using (Html.BeginForm("Edit", "Applicant", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.ApplicantId)
+
+            <h4 class="mb-3">Edit Applicant</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.FullName, new { @class = "form-label fw-bold" })
+                        @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", placeholder = "Enter full name" })
+                        @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.Email, new { @class = "form-label fw-bold" })
+                        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Enter email" })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.PhoneNumber, new { @class = "form-label fw-bold" })
+                        @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control", type = "tel", placeholder = "Enter phone number" })
+                        @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        @Html.LabelFor(model => model.CreatedAt, new { @class = "form-label fw-bold" })
+                        @Html.TextBoxFor(model => model.CreatedAt, new { @class = "form-control", type = "date", Value = Model.CreatedAt.ToString("yyyy-MM-dd") })
+                        @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <!-- Upload Avatar -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Avatar</label>
+                    @Html.HiddenFor(model => model.AvatarPath)
+                    <div class="d-flex align-items-center">
+                        <div id="avatarPreview" class="me-3">
+                            @if (!string.IsNullOrEmpty(Model.AvatarPath))
+                            {
+                                <img src="@Url.Content(Model.AvatarPath)" alt="Avatar" class="rounded-circle border" style="width: 80px; height: 80px;">
+                            }
+                        </div>
+                        <div>
+                            <input type="file" class="form-control" name="AvatarFile" accept="image/*" id="avatarInput">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload CV -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">CV</label>
+                    @Html.HiddenFor(model => model.CVPath)
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.CVPath))
+                        {
+                            <a href="@Url.Content(Model.CVPath)" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-file-earmark-text"></i> View CV
+                            </a>
+                        }
+                        <input type="file" class="form-control mt-2" name="CVFile" accept=".pdf,.doc,.docx">
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save"></i> Save</button>
+                    @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary px-4" })
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // Hiển thị ảnh preview khi chọn Avatar
+        document.getElementById('avatarInput')?.addEventListener('change', function (event) {
+            let preview = document.getElementById('avatarPreview');
+            let file = event.target.files[0];
+
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.innerHTML = `<img src="${e.target.result}" class="rounded-circle border" style="width: 80px; height: 80px;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

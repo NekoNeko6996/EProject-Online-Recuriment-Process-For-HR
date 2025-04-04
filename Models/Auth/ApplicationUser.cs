@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Sem3EProjectOnlineCPFH.Models;
+using Sem3EProjectOnlineCPFH.Models.Data;
+using System.Collections.Generic;
 
 namespace Sem3EProjectOnlineCPFH.Models.Auth
 {
@@ -23,6 +25,9 @@ namespace Sem3EProjectOnlineCPFH.Models.Auth
 
         //
         public virtual UserProfile UserProfile { get; set; }
+
+        // User Interview relationship 1-n 
+        public virtual ICollection<Interview> Interviews { get; set; } = new List<Interview>();
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

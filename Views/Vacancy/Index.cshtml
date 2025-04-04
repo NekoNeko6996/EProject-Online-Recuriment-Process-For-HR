@@ -1,0 +1,141 @@
+﻿@model PagedList.IPagedList<Sem3EProjectOnlineCPFH.Models.Data.Vacancy>
+@using PagedList.Mvc
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Vacancy List";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Vacancy List</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Thanh tìm kiếm và nút tạo mới căn hai bên -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary" })
+
+        @using (Html.BeginForm("Index", "Vacancy", FormMethod.Get, new { @class = "form-inline d-flex" }))
+        {
+            @Html.TextBox("search", ViewBag.Search as string, new { @class = "form-control me-2", placeholder = "Search by title or department..." })
+            <button type="submit" class="btn btn-info">Search</button>
+        }
+    </div>
+
+    <!-- Hiển thị danh sách Vacancy dưới dạng thẻ -->
+    @if (Model.Any())
+    {
+        <div class="row">
+            @{
+                int count = 0;
+            }
+
+            @foreach (var item in Model)
+            {
+                if (count % 3 == 0 && count != 0)
+                {
+                @:</div><div class="row">
+                }
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm position-relative">
+                        <!-- Badge Status góc trên phải -->
+                        <span class="position-absolute top-0 end-0 mt-2 me-2 px-3 py-1 rounded text-white
+                            @(item.Status == "Open" ? "bg-success" :
+                              item.Status == "Closed" ? "bg-danger" :
+                              "bg-warning")">
+                            @item.Status
+                        </span>
+
+                        <div class="card-body">
+                            <!-- Hiển thị tiêu đề -->
+                            <h5 class="card-title text-truncate" style="max-width: 100%;" title="@item.Title">
+                                @item.Title
+                            </h5>
+                            <hr />
+                            <p class="card-text"><strong>Department:</strong> @item.Department.DepartmentName</p>
+                            <p class="card-text"><strong>Created:</strong> @item.CreatedAt.ToString("dd/MM/yyyy")</p>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between">
+                            <a href="@Url.Action("Details", new { id = item.VacancyId })" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Details
+                            </a>
+                            <div class="d-flex flex-row gap-1">
+                                @if (item.Status != "Closed")
+                                {
+                                    <a href="@Url.Action("Edit", new { id = item.VacancyId })" class="btn btn-outline-warning btn-sm">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                }
+                                @using (Html.BeginForm("DeleteConfirmed", "Vacancy", FormMethod.Post, new { @Class = "deletevacancy-" + @item.VacancyId }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", item.VacancyId)
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete('@item.VacancyId', '@item.Title')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                count++;
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No vacancies found.</p>
+    }
+
+    <!-- Phân trang -->
+    <div class="d-flex flex-column align-items-center mt-3">
+        <div>
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+        </div>
+        <div class="mt-2">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, search = ViewBag.Search }),
+            new PagedListRenderOptions
+            {
+                Display = PagedListDisplayMode.IfNeeded,
+                MaximumPageNumbersToDisplay = 5,
+                ContainerDivClasses = new[] { "pagination-container", "d-flex", "justify-content-center" },
+                UlElementClasses = new[] { "pagination", "gap-2" } // Thêm class để tạo khoảng cách
+            })
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(vid, vname) {
+        showAlert('Warning',
+            [
+                "Are you sure you want to DELETE this Vacancy?",
+                "<strong style='color: red; text-decoration: underline;'>Be Careful!</strong>",
+                "<strong style='color: red; text-decoration: underline;'>This action will delete all information of tables related to this vacancy!</strong>",
+                "UID: " + vid,
+                "Vacancy Title: [" + vname + "]"
+            ],
+            "Confirm",
+            function () {
+                document.querySelector('.deletevacancy-' + vid).submit();
+            }
+        );
+    }
+</script>

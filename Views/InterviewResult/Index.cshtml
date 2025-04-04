@@ -1,0 +1,384 @@
+﻿@model IPagedList<Sem3EProjectOnlineCPFH.Models.Data.Interview>
+@using PagedList.Mvc;
+@using PagedList;
+
+@{
+    Layout = "~/Views/Shared/_InterviewLayout.cshtml";
+    ViewBag.Title = "Interview Result Management";
+    string resultType = ViewBag.ResultType as string ?? "Selected";
+}
+
+<div class="interview-result-container">
+    <div class="result-header mt-5">
+        <h2>@ViewBag.Title</h2>
+
+        <div class="result-actions mb-4 ">
+            <div class="result-filter btn-group mb-4">
+
+                <a href="@Url.Action("Selected")" class="btn @(resultType == "Selected" ? "btn-primary" : "btn-outline-primary")">
+                    <i class="bi bi-check-circle"></i> Selected Applicants
+                </a>
+                <a href="@Url.Action("Rejected")" class="btn @(resultType == "Rejected" ? "btn-primary" : "btn-outline-primary")">
+                    <i class="bi bi-x-circle"></i> Rejected Applicants
+                </a>
+            </div>
+            <div class="search-panel border rounded-3 p-3 mb-4" style="border-color: #0D6EFD !important;">
+                @using (Html.BeginForm("Index", "InterviewResult", FormMethod.Get, new { @class = "search-form" }))
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" name="searchName" value="@ViewBag.SearchName"
+                                   placeholder="Search by candidate name..." class="form-control">
+                            <input type="hidden" name="resultType" value="@resultType">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="searchDepartment" value="@ViewBag.SearchDepartment"
+                                   placeholder="Search by department..." class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" name="searchPosition" value="@ViewBag.SearchPosition"
+                                   placeholder="Search by position..." class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Message"]
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="result-grid">
+        @if (Model.Any())
+        {
+            foreach (var interview in Model)
+            {
+                <div class="result-card">
+                    <div class="candidate-info">
+                        <div class="candidate-name">@interview.Applicant.FullName</div>
+                        <div class="department-name">
+                            <i class="bi bi-building"></i> @interview.Vacancy.Department.DepartmentName
+                        </div>
+                        <div class="position-name">
+                            <i class="bi bi-briefcase"></i> @interview.Vacancy.Title
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-info btn-sm contact-btn" onclick="showContactPanel('@interview.ApplicantId')">
+                            <i class="bi bi-person-lines-fill"></i> Contact
+                        </button>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="btn-group result-toggle">
+                                @{
+                                    var interviewId = interview.InterviewId;
+                                    var currentResult = interview.Result;
+                                }
+                                <button class="btn btn-sm @(currentResult == "Selected" ? "btn-success" : "btn-outline-success")"
+                                        onclick="return updateResult(@interviewId, 'Selected')">
+                                    <i class="bi bi-check"></i> Select
+                                </button>
+                                <button class="btn btn-sm @(currentResult == "Rejected" ? "btn-danger" : "btn-outline-danger")"
+                                        onclick="return updateResult(@interviewId, 'Rejected')">
+                                    <i class="bi bi-x"></i> Reject
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="contact-panel" id="contact-panel-@interview.ApplicantId" style="display: none;">
+                    <div class="contact-content card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Applicant Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+
+                                <div class="col-md-3 text-center">
+                                    <div class="avatar-container">
+                                        @if (!string.IsNullOrEmpty(interview.Applicant.AvatarPath))
+                                        {
+                                            <img src="@Url.Content(interview.Applicant.AvatarPath)" class="avatar-image" style="max-width: 100px; aspect-ratio: 1/1" alt="Candidate Avatar">
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-person-circle" style="font-size: 3rem; color: #6c757d;"></i>
+                                        }
+                                    </div>
+                                    <h5>@interview.Applicant.FullName</h5>
+                                    <div class="status-badge @interview.Result.ToLower() mb-3">
+                                        @interview.Result
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-5">
+                                    <div class="info-section">
+                                        <h6><i class="bi bi-person-lines-fill"></i> Personal Information</h6>
+                                        <div class="info-item">
+                                            <label>Applicant ID:</label>
+                                            <span>@interview.ApplicantId</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Email:</label>
+                                            <span>@interview.Applicant.Email</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Phone:</label>
+                                            <span>@(interview.Applicant.PhoneNumber ?? "N/A")</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Applied Date:</label>
+                                            <span>@(interview.Applicant.CreatedAt.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-section mt-2 ">
+                                        <h6><i class="bi bi-file-earmark-text"></i> Application Details</h6>
+                                        <div class="info-item">
+                                            <label>Position:</label>
+                                            <span>@interview.Vacancy.Title</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Department:</label>
+                                            <span>@interview.Vacancy.Department.DepartmentName</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-4">
+                                    <div class="info-section">
+                                        <h6><i class="bi bi-calendar-check"></i> Interview Information</h6>
+                                        <div class="info-item">
+                                            <label>Date:</label>
+                                            <span>@(interview.ScheduledDate.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Time:</label>
+                                            <span>@interview.StartTime.ToString(@"hh\:mm") - @interview.EndTime.ToString(@"hh\:mm")</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Interviewer:</label>
+                                            <span>@interview.InterviewerId</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Status:</label>
+                                            <span class="status-badge">@interview.Status</span>
+                                        </div>
+                                    </div>
+
+
+                                    @if (!string.IsNullOrEmpty(interview.Applicant.CVPath))
+                                    {
+                                        <div class="text-center mt-3">
+                                            <a href="@Url.Content(interview.Applicant.CVPath)"
+                                               target="_blank"
+                                               class="btn btn-primary btn-sm">
+                                                <i class="bi bi-download"></i> Download CV
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No interview results found.
+            </div>
+        }
+    </div>
+
+    <div class="mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            searchName = ViewBag.SearchName,
+            searchDepartment = ViewBag.SearchDepartment,
+            searchPosition = ViewBag.SearchPosition,
+            resultType = resultType
+        }), new PagedListRenderOptions
+        {
+            DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+            DisplayLinkToLastPage = PagedListDisplayMode.Never,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Never,
+            DisplayLinkToNextPage = PagedListDisplayMode.Never,
+            DisplayEllipsesWhenNotShowingAllPageNumbers = false
+        })
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener('click', function (e) {
+                if (e.target.classList.contains('contact-panel')) {
+                    e.target.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function showContactPanel(applicantId) {
+            // Ẩn tất cả contact-panel trước khi mở đúng panel
+            document.querySelectorAll(".contact-panel").forEach(panel => panel.style.display = "none");
+
+            // Hiển thị panel tương ứng với applicantId
+            var panel = document.getElementById("contact-panel-" + applicantId);
+            if (panel) {
+                panel.style.display = "flex";
+            }
+        }
+    </script>
+}
+<style>
+
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .candidate-info {
+        flex-grow: 1;
+    }
+
+    .candidate-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2c3e50;
+    }
+
+    .department-name, .position-name {
+        font-size: 1rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .action-buttons {
+        text-align: right;
+    }
+
+    .contact-btn {
+        transition: all 0.2s ease;
+    }
+
+
+    .contact-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .contact-content {
+        max-width: 800px;
+        width: 90%;
+        animation: fadeIn 0.3s;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        border: 1px solid #0d6efd;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .result-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+        .pagination li {
+            list-style: none;
+        }
+
+        .pagination a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #0D6EFD !important;
+            border-radius: 50% !important;
+            color: #000 !important;
+            text-decoration: none !important;
+            font-size: 14px;
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+
+
+            .pagination a:hover {
+                background-color: #0D6EFD !important;
+                color: white !important;
+                transform: translateY(-5px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .pagination .active a {
+            background-color: #0D6EFD !important;
+            color: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination .PagedList-skipToPrevious,
+        .pagination .PagedList-skipToNext {
+            display: none !important;
+        }
+</style>

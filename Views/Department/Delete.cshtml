@@ -1,0 +1,60 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Department
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Delete Department";
+    string DID = Model.DepartmentId.ToString();
+}
+
+<h2>Delete Department</h2>
+
+<h4>Are you sure you want to delete this department?</h4>
+<hr />
+
+@* alert *@
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <p class="m-0">@TempData["ErrorMessage"]</p>
+    </div>
+}
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>Department ID</dt>
+        <dd>@Html.DisplayFor(model => model.DepartmentId)</dd>
+
+        <dt>Department Name</dt>
+        <dd>@Html.DisplayFor(model => model.DepartmentName)</dd>
+    </dl>
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "deletedepartment-" + DID }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <button type="button" class="btn btn-danger"
+                    onclick="confirmDelete('@DID', '@Model.DepartmentName')">
+                Delete
+            </button>
+            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    }
+
+</div>
+
+<script>
+    function confirmDelete(did, dname) {
+        showAlert('Warning',
+            [
+                "Are you sure you want to DELETE this Department?",
+                "UID: " + did,
+                "Department Name: [" + dname + "]"
+            ],
+            "Confirm",
+            function () {
+                document.getElementById("deletedepartment-" + did).submit();
+            }
+        );
+    }
+</script>

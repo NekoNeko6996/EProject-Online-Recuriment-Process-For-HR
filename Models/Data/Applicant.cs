@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Sem3EProjectOnlineCPFH.Models.Enum;
 using System.Linq;
 using System.Web;
 
@@ -9,7 +11,8 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
     public class Applicant
     {
         [Key]
-        public int ApplicantId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string ApplicantId { get; set; }
 
         [Required, MaxLength(50)]
         public string FullName { get; set; }
@@ -18,10 +21,10 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
         public string Email { get; set; }
 
         public string PhoneNumber { get; set; }
-        public string CVFile { get; set; }
-        public string AvatarUrl { get; set; }
-        public string Status { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string CVPath { get; set; }
+        public string AvatarPath { get; set; }
+        public ApplicantStatus Status { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string AttachedVacancies { get; set; }
 
         public virtual ICollection<Applicant_Vacancy> ApplicantVacancies { get; set; }

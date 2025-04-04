@@ -1,0 +1,78 @@
+﻿@model Sem3EProjectOnlineCPFH.Models.Data.Applicant
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Applicant Details";
+}
+
+<div class="container mt-4 d-flex justify-content-center">
+    <div class="card border shadow-sm" style="max-width: 450px; width: 100%;">
+        <div class="card-header bg-primary text-white text-center py-2">
+            <h5 class="mb-0"><i class="fas fa-user"></i> Applicant Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    @if (!string.IsNullOrEmpty(Model.AvatarPath))
+                    {
+                        <img src="@Url.Content(Model.AvatarPath)" class="rounded-circle border shadow"
+                             style="width: 120px; height: 120px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <p><em>No Avatar</em></p>
+                    }
+                </div>
+                <div class="col-12">
+                    <p><strong>@Html.DisplayNameFor(model => model.ApplicantId):</strong> @Html.DisplayFor(model => model.ApplicantId)</p>
+                    <p><strong>@Html.DisplayNameFor(model => model.FullName):</strong> @Html.DisplayFor(model => model.FullName)</p>
+                    <p><strong>@Html.DisplayNameFor(model => model.Email):</strong> @Html.DisplayFor(model => model.Email)</p>
+                    <p><strong>@Html.DisplayNameFor(model => model.PhoneNumber):</strong> @Html.DisplayFor(model => model.PhoneNumber)</p>
+                    <p><strong>@Html.DisplayNameFor(model => model.CreatedAt):</strong> @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                    <p>
+                        <strong>@Html.DisplayNameFor(model => model.Status):</strong>
+                        <span class="badge p-2
+                              @(Model.Status.ToString().ToLower() == "notapproved" ? "bg-warning" :
+                                Model.Status.ToString().ToLower() == "added" ? "bg-info" :
+                                Model.Status.ToString().ToLower() == "scheduled" ? "bg-primary" :
+                                Model.Status.ToString().ToLower() == "haspassed" ? "bg-success" :
+                                Model.Status.ToString().ToLower() == "rejected" ? "bg-danger" :
+                                "bg-secondary")">
+                            @Html.DisplayFor(model => model.Status)
+                        </span>
+                    </p>
+
+                    <!-- Vacancy (Từ form Create) -->
+                    <p><strong>Vacancy:</strong> @Html.DisplayFor(model => model.AttachedVacancies)</p>
+
+                    <!-- Download CV với đường dẫn ngẫu nhiên -->
+                    <p>
+                        <strong>CV:</strong>
+                        @if (!string.IsNullOrEmpty(Model.CVPath))
+                        {
+                            <a href="@Url.Content(Model.CVPath)" class="btn btn-outline-primary btn-sm" target="_blank">
+                                <i class="fas fa-file-alt"></i> Download CV
+                            </a>
+                        }
+                        else
+                        {
+                            <span>No CV Uploaded</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.ApplicantId }, new { @class = "btn btn-warning mx-2" })
+            @* check if url exits returnurl *@
+            @if (Request.QueryString["returnurl"] != null)
+            {
+                <a href="@Request.QueryString["returnurl"]" class="btn btn-primary mx-2">Back</a>
+            }
+            else
+            {
+                @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+            }
+        </div>
+    </div>
+</div>

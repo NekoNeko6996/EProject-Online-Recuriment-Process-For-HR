@@ -1,0 +1,182 @@
+﻿@model IPagedList<Sem3EProjectOnlineCPFH.Models.Vacancy>
+@using PagedList.Mvc;
+@using PagedList;
+
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+
+
+<div class="text-center p-3 mb-4" , sans-serif;">
+    <h1 class="my-4 text-dark">Job Vacancies List</h1>
+</div>
+
+
+<div class="search-panel border rounded-3 p-3 mb-4" style="border-color: #0D6EFD !important;">
+    @using (Html.BeginForm("Index", "Vacancy", FormMethod.Get))
+    {
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <input type="text" name="searchTitle" class="form-control hover-blue"
+                       placeholder="Job title"
+                       value="@Request.QueryString["searchTitle"]">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="searchDepartment" class="form-control hover-blue"
+                       placeholder="Department"
+                       value="@Request.QueryString["searchDepartment"]">
+            </div>
+            <div class="col-md-2">
+                <select name="statusFilter" class="form-select hover-blue">
+                    <option value="">All statuses</option>
+                    <option value="Open" @(Request.QueryString["statusFilter"] == "Open" ? "selected" : "")>Open</option>
+                    <option value="Closed" @(Request.QueryString["statusFilter"] == "Closed" ? "selected" : "")>Closed</option>
+                    <option value="Suspended" @(Request.QueryString["statusFilter"] == "Suspended" ? "selected" : "")>Suspended</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+
+<div class="row mt-3 g-3 align-items-center">
+    <div class="col-md-6">
+        <div class="stats-display">
+            @if (ViewBag.SearchCount != null)
+            {
+                <span>Showing <strong>@ViewBag.SearchCount</strong> vacancies (Total: @ViewBag.TotalCount)</span>
+            }
+            else
+            {
+                <span>Total <strong>@ViewBag.TotalCount</strong> vacancies</span>
+            }
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="sorting-options">
+            <span class="me-2">Sort by:</span>
+            @Html.ActionLink("Newest", "Index", new { sortOrder = ViewBag.DateSortParm, searchTitle = Request.QueryString["searchTitle"], searchDepartment = Request.QueryString["searchDepartment"], statusFilter = Request.QueryString["statusFilter"] }, new { @class = "btn btn-sm " + (ViewBag.CurrentSort == "date_desc" ? "btn-primary text-black" : "btn-outline-primary text-black") })
+            @Html.ActionLink("Oldest", "Index", new { sortOrder = "Date", searchTitle = Request.QueryString["searchTitle"], searchDepartment = Request.QueryString["searchDepartment"], statusFilter = Request.QueryString["statusFilter"] }, new { @class = "btn btn-sm " + (ViewBag.CurrentSort == "Date" ? "btn-primary text-black" : "btn-outline-primary text-black") })
+        </div>
+    </div>
+</div>
+
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 m-1">
+    @foreach (var vacancy in Model)
+    {
+        <div class="col">
+            <a href="@Url.Action("Index", "Candidate", new { vacancyId = vacancy.VacancyId })"
+               class="text-decoration-none card-link">
+                <div class="card h-100 shadow-sm bg-white rounded-3 border-2 hover-card" style="border-color: transparent !important;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold mb-0 text-dark">@vacancy.Title</h5>
+                            <span class="badge @(vacancy.Status == "Open" ? "bg-success" : vacancy.Status == "Closed" ? "bg-secondary" : "bg-warning")">
+                                @vacancy.Status
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted">Department:</small>
+                            <div class="text-dark">@(vacancy.Department?.Name ?? "Not specified")</div>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted">Applicants:</small>
+                            <div class="text-dark">
+                                <strong>
+                                    @(ViewBag.ApplicantByVacancy?.ContainsKey(vacancy.VacancyId) == true ? ViewBag.ApplicantByVacancy[vacancy.VacancyId] : 0)
+                                </strong> applicants
+                            </div>
+                        </div>
+                        <div>
+                            <small class="text-muted">Deadline:</small>
+                            <div class="text-dark">@(vacancy.Deadline?.ToString("MM/dd/yyyy") ?? "No deadline")</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+
+<div class="mt-4">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+    {
+        page,
+        searchTitle = Request.QueryString["searchTitle"],
+        searchDepartment = Request.QueryString["searchDepartment"],
+        statusFilter = Request.QueryString["statusFilter"],
+        sortOrder = Request.QueryString["sortOrder"]
+    }))
+</div>
+
+<style>
+
+    .hover-blue:hover {
+        border-color: #0D6EFD !important;
+    }
+
+
+    .hover-card {
+        transition: all 0.3s ease;
+        border: 2px solid #0D6EFD !important;
+    }
+
+    .card-link:hover .hover-card {
+        border-color: #0D6EFD !important;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .pagination li {
+        list-style: none;
+    }
+
+    .pagination a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid #0D6EFD !important;
+        border-radius: 50% !important;
+        color: #000 !important;
+        text-decoration: none !important;
+        font-size: 14px;
+        background-color: white;
+        transition: all 0.2s ease; 
+    }
+
+       
+        .pagination a:hover {
+            background-color: #0D6EFD !important;
+            color: white !important;
+            transform: translateY(-5px); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+   
+    .pagination .active a {
+        background-color: #0D6EFD !important;
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .pagination .PagedList-skipToPrevious,
+    .pagination .PagedList-skipToNext {
+        display: none !important;
+    }
+
+
+</style>

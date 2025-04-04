@@ -11,17 +11,25 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
     public class Vacancy
     {
         [Key]
-        public int VacancyId { get; set; }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string VacancyId { get; set; }
         public string OwnerId { get; set; }
 
         [Required, MaxLength(100)]
         public string Title { get; set; }
 
         public string Description { get; set; }
-        public int DepartmentId { get; set; }
+
+        [Required]
+        public string DepartmentId { get; set; }
+
+        [Required, MaxLength(100)]
         public string Status { get; set; }
-        public int NumberOfOpenings { get; set; }
+
+        [Required]
+        public int NumberOfPositions { get; set; }
+
+        [Required]
         public DateTime Deadline { get; set; }
         public int ApplicationLimit { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -32,7 +40,6 @@ namespace Sem3EProjectOnlineCPFH.Models.Data
 
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; }
-
 
         //
         public virtual ICollection<Applicant_Vacancy> ApplicantVacancies { get; set; } = new List<Applicant_Vacancy>();
