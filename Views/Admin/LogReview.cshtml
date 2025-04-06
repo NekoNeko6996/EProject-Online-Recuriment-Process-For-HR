@@ -54,18 +54,46 @@
         <nav>
             <ul class="pagination">
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                    <a class="page-link" href="@Url.Action("LogReview", new { page = currentPage - 1, startDateTime = startDateTime, endDateTime = endDateTime })">Prev</a>
+                    <a class="page-link" href="@Url.Action("LogReview", new { page = currentPage - 1, startDateTime, endDateTime })">Prev</a>
                 </li>
 
-                @for (int i = 1; i <= totalPages; i++)
-                {
-                    <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("LogReview", new { page = i, startDateTime = startDateTime, endDateTime = endDateTime })">@i</a>
-                    </li>
+                @{
+                    int visiblePages = 2; // số trang hiển thị trước và sau trang hiện tại
+                    int start = Math.Max(1, currentPage - visiblePages);
+                    int end = Math.Min(totalPages, currentPage + visiblePages);
+
+                    if (start > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("LogReview", new { page = 1, startDateTime, endDateTime })">1</a>
+                        </li>
+                        if (start > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+
+                    for (int i = start; i <= end; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("LogReview", new { page = i, startDateTime, endDateTime })">@i</a>
+                        </li>
+                    }
+
+                    if (end < totalPages)
+                    {
+                        if (end < totalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("LogReview", new { page = totalPages, startDateTime, endDateTime })">@totalPages</a>
+                        </li>
+                    }
                 }
 
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                    <a class="page-link" href="@Url.Action("LogReview", new { page = currentPage + 1, startDateTime = startDateTime, endDateTime = endDateTime })">Next</a>
+                    <a class="page-link" href="@Url.Action("LogReview", new { page = currentPage + 1, startDateTime, endDateTime })">Next</a>
                 </li>
             </ul>
         </nav>

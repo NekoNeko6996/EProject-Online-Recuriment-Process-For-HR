@@ -137,6 +137,21 @@ namespace Sem3EProjectOnlineCPFH.Controllers
                 return View(interview);
             }
 
+            // Check to see if the interviewer has any interviews during this time.
+            var existingInterviews = db.Interviews
+                .Where(i => i.InterviewerId == interview.InterviewerId && i.ScheduledDate == interview.ScheduledDate)
+                .ToList();
+
+            foreach (var existingInterview in existingInterviews)
+            {
+                if ((interview.StartTime >= existingInterview.StartTime && interview.StartTime < existingInterview.EndTime) ||
+                    (interview.EndTime > existingInterview.StartTime && interview.EndTime <= existingInterview.EndTime))
+                {
+                    TempData["ErrorMessage"] = "Interviewer is already scheduled for another interview during this time.";
+                    return View(interview);
+                }
+            }
+
             using (var transaction = db.Database.BeginTransaction())
             {
                 try

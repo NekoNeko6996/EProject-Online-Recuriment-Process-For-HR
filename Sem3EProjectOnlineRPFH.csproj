@@ -203,6 +203,17 @@
     <Content Include="Content\Resources\nav-logo-web-workspace-blue.png" />
     <Content Include="Content\Resources\nav-logo-wellcome.png" />
     <Content Include="Content\Resources\planet.png" />
+    <Content Include="Content\Resources\VideoManual\AddScheduleInterview.mp4" />
+    <Content Include="Content\Resources\VideoManual\AddNewApplicant.mp4" />
+    <Content Include="Content\Resources\VideoManual\AddNewUser.mp4" />
+    <Content Include="Content\Resources\VideoManual\ChangeInfo.mp4" />
+    <Content Include="Content\Resources\VideoManual\CreateEditDeleteDepartment.mp4" />
+    <Content Include="Content\Resources\VideoManual\Create Vacancy.mp4" />
+    <Content Include="Content\Resources\VideoManual\EditInterview.mp4" />
+    <Content Include="Content\Resources\VideoManual\FirstRegister.mp4" />
+    <Content Include="Content\Resources\VideoManual\Interview.mp4" />
+    <Content Include="Content\Resources\VideoManual\LogoutLogin.mp4" />
+    <Content Include="Content\Resources\VideoManual\PostponeInterview.mp4" />
     <Content Include="Content\Resources\WebLogo.png" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />

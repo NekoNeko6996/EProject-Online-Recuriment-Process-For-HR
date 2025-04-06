@@ -104,6 +104,7 @@
             <div class="collapse navbar-collapse w-100" id="navbarNav">
                 @*right nav*@
                 <ul class="navbar-nav ms-auto">
+                    <li><a class="nav-link" href="/Default/Help">Help</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         if (ViewBag.CurrentUserRole == "admin")

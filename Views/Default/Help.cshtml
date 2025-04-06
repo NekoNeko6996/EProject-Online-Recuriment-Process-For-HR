@@ -1,31 +1,133 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Help";
     Layout = "~/Views/Shared/_DefaultLayoutPage.cshtml";
 }
 
+<style>
+    @@media (max-width: 768px) {
+    .sidebar {
+        position: static !important;
+        height: auto !important;
+    }
+}
+</style>
+
 <div class="container-fluid">
     <div class="row">
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar position-sticky top-0 vh-100 overflow-auto bg-light">
             <h5>Documents</h5>
             <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="#usermanual">User manual</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact">Contact information</a></li>
+                <li class="nav-item"><a class="nav-link" href="#usermanual">User Manual</a></li>
+                <ul class="nav flex-column ms-3">
+                    <li class="nav-item"><a class="nav-link" href="#video1">1. First Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video2">2. Login & Logout</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video3">3. Add New User</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video4">4. Add New Applicant</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video5">5. Create Vacancy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video6">6. Dept. Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video7">7. Schedule Interview</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video8">8. Edit Interview</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video9">9. Postpone Interview</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#video10">10. Interview Process</a></li>
+                </ul>
+                <li class="nav-item mt-2"><a class="nav-link" href="#contact">Contact Information</a></li>
             </ul>
         </nav>
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
+
+        <main id="top" class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
             <section id="usermanual" class="mt-4 border rounded p-3">
-                <h2>User manual</h2>
+                <h2>User Manual</h2>
                 <hr />
-                <p>.</p>
+                <p>Below are instructional videos to help you use the system efficiently:</p>
+
+                <div class="mb-4" id="video1">
+                    <h5>1. First Time Register</h5>
+                    <p>How to create an account and get started.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/FirstRegister.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video2">
+                    <h5>2. Login & Logout</h5>
+                    <p>Quick guide to log into and out of the system.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/LogoutLogin.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video3">
+                    <h5>3. Add New User</h5>
+                    <p>Steps to add a new user into the system.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/AddNewUser.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video4">
+                    <h5>4. Add New Applicant</h5>
+                    <p>How to register a new applicant.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/AddNewApplicant.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video5">
+                    <h5>5. Create Vacancy</h5>
+                    <p>Guide to creating job vacancies for recruitment.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/Create Vacancy.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video6">
+                    <h5>6. Create/Edit/Delete Department</h5>
+                    <p>Manage departments efficiently.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/CreateEditDeleteDepartment.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video7">
+                    <h5>7. Schedule an Interview</h5>
+                    <p>Steps to schedule an interview for an applicant.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/AddScheduleInterview.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video8">
+                    <h5>8. Edit Interview</h5>
+                    <p>Edit interview details such as time, method, or interviewer.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/EditInterview.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video9">
+                    <h5>9. Postpone Interview</h5>
+                    <p>How to postpone a scheduled interview.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/PostponeInterview.mp4")" type="video/mp4" />
+                    </video>
+                </div>
+
+                <div class="mb-4" id="video10">
+                    <h5>10. Interview Process</h5>
+                    <p>Walkthrough of the interview process management.</p>
+                    <video width="100%" controls>
+                        <source src="@Url.Content("~/Content/Resources/VideoManual/Interview.mp4")" type="video/mp4" />
+                    </video>
+                </div>
             </section>
+
             <section id="contact" class="mt-4 border rounded p-3">
                 <h2>Contact & Bug Report</h2>
                 <hr />
 
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Phone:</strong> 0563938131</p>
+                        <p><strong>Phone:</strong> 0123456789</p>
                         <p><strong>Email:</strong> nhnama23030@cusc.ctu.edu.vn</p>
                         <p><strong>Address:</strong> 1 Ly Tu Trong, Ninh Kieu District, Can Tho City, Vietnam.</p>
                         <p><strong>Fax:</strong> 0292-123456</p>
@@ -39,4 +141,8 @@
             </section>
         </main>
     </div>
+</div>
+
+<div class="text-end my-3 position-fixed" style="bottom: 50px; left: 10px;">
+    <a href="#top" class="btn btn-secondary">⬆ Back to Top</a>
 </div>

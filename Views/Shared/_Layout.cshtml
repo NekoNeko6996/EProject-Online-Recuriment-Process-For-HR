@@ -123,6 +123,7 @@
             <div class="collapse navbar-collapse w-100" id="navbarNav">
                 @*right nav*@
                 <ul class="navbar-nav ms-auto">
+                    <li><a class="nav-link" href="/Default/Help">Help</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">@Html.ActionLink("Department", "Index", "Department", null, new { @class = "nav-link" })</li>
@@ -254,24 +255,5 @@
             </div>
         </div>
     </div>
-
-    @*<script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var forms = document.getElementsByTagName("form");
-            var overlay = document.getElementById("loadingSpinner");
-
-            for (var i = 0; i < forms.length; i++) {
-                forms[i].addEventListener("submit", function () {
-                    overlay.style.display = "flex";
-                });
-            }
-
-            // Kiểm tra nếu ModelState không hợp lệ, tự động ẩn overlay
-            var hasModelError = document.getElementById("HasModelError");
-            if (hasModelError && hasModelError.value === "True") {
-                overlay.style.display = "none";
-            }
-        });
-    </script>*@
 </body>
 </html>

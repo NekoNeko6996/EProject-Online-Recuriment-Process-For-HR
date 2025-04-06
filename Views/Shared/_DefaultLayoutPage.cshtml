@@ -89,13 +89,14 @@
             <a class="navbar-brand p-0" href="/Home/Index" style="font-size: 25px; height: 40px;">
                 <img src="@Url.Content("~/Content/Resources/nav-logo-web-help-blue.png")" alt="Alternate Text" class="m-0" style="height: 40px" />
             </a>
+            <a class="nav-link" href="/Default/Help">Help</a>
             <a href="/Home/Index" class="nav-link">Home</a>
             @if (!User.Identity.IsAuthenticated)
             {
                 <a href="/Account/Login" class="nav-link">Login</a>
             }
             else
-            {
+            {   
                 <a href="/Account/Logout" class="nav-link">Logout</a>
             }
         </div>
